@@ -3,8 +3,9 @@ import {
   ParsedEvent,
   ReconnectInterval,
 } from "eventsource-parser";
+import { validateAPIKey, getDefaultModel } from "./apiConfig";
 
-export type ChatGPTAgent = "user" | "system";
+export type ChatGPTAgent = "user" | "system" | "assistant";
 
 export interface ChatGPTMessage {
   role: ChatGPTAgent;
@@ -24,82 +25,131 @@ export interface OpenAIStreamPayload {
   api_key?: string;
 }
 
+interface APIConfig {
+  baseURL: string;
+  apiKey: string;
+  model: string;
+}
+
+function getAPIConfig(): APIConfig {
+  const baseURL = process.env.OPENAI_API_BASE || "https://api.openai.com/v1";
+  const model = process.env.OPENAI_MODEL || getDefaultModel(baseURL);
+  
+  let apiKey = process.env.OPENAI_API_KEY || "";
+  
+  // Support multiple API keys (comma-separated)
+  if (apiKey.includes(",")) {
+    const apiKeys = apiKey.split(",").map(key => key.trim());
+    const randomIndex = Math.floor(Math.random() * apiKeys.length);
+    apiKey = apiKeys[randomIndex];
+  }
+  
+  return { baseURL, apiKey, model };
+}
+
 export async function OpenAIStream(payload: OpenAIStreamPayload) {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
-  function randomNumberInRange(min, max) {
-    // 👇️ 获取 min（含）和 max（含）之间的数字
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-  var keys = process.env.OPENAI_API_KEY || "";
-  const apikeys = keys?.split(",");
-  const randomNumber = randomNumberInRange(0, apikeys.length - 1);
-  const newapikey = apikeys[randomNumber];
-
   let counter = 0;
 
-  const useUserKey = process.env.NEXT_PUBLIC_USE_USER_KEY === "true" ? true : false;
+  const useUserKey = process.env.NEXT_PUBLIC_USE_USER_KEY === "true";
+  const config = getAPIConfig();
+  
+  // Use user-provided key if enabled, otherwise use environment key
+  const apiKey = useUserKey ? (payload.api_key || "") : config.apiKey;
+  const baseURL = config.baseURL;
+  const model = payload.model || config.model;
 
-  var openai_api_key = (useUserKey ? payload.api_key : process.env.OPENAI_API_KEY) || ""
-  if(!useUserKey){
-    openai_api_key = newapikey
+  if (!apiKey) {
+    throw new Error("API key is required");
   }
 
-  function checkString(str :string) {
-    var pattern = /^sk-[A-Za-z0-9]{48}$/;
-    return pattern.test(str);
+  if (!validateAPIKey(apiKey, baseURL)) {
+    throw new Error("Invalid API key format");
   }
-  if(!checkString(openai_api_key)) {
-    throw new Error('OpenAI API Key Format Error')
-  }
-  delete payload.api_key
 
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${openai_api_key ?? ""}`,
-    },
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
+  // Clean payload
+  const cleanPayload = { ...payload, model };
+  delete cleanPayload.api_key;
 
-  const stream = new ReadableStream({
-    async start(controller) {
-      // callback
-      function onParse(event: ParsedEvent | ReconnectInterval) {
-        if (event.type === "event") {
-          const data = event.data;
-          // https://beta.openai.com/docs/api-reference/completions/create#completions/create-stream
-          if (data === "[DONE]") {
-            controller.close();
-            return;
-          }
-          try {
-            const json = JSON.parse(data);
-            const text = json.choices[0].delta?.content || "";
-            if (counter < 2 && (text.match(/\n/) || []).length) {
-              // this is a prefix character (i.e., "\n\n"), do nothing
+  const endpoint = `${baseURL}/chat/completions`;
+  const timeout = parseInt(process.env.REQUEST_TIMEOUT || "30000");
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const res = await fetch(endpoint, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+        "User-Agent": "Weekly-Report/1.0.0",
+      },
+      method: "POST",
+      body: JSON.stringify(cleanPayload),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`API request failed: ${res.status} ${res.statusText} - ${errorText}`);
+    }
+
+    const stream = new ReadableStream({
+      async start(controller) {
+        function onParse(event: ParsedEvent | ReconnectInterval) {
+          if (event.type === "event") {
+            const data = event.data;
+            
+            if (data === "[DONE]") {
+              controller.close();
               return;
             }
-            const queue = encoder.encode(text);
-            controller.enqueue(queue);
-            counter++;
-          } catch (e) {
-            // maybe parse error
-            controller.error(e);
+            
+            try {
+              const json = JSON.parse(data);
+              const text = json.choices?.[0]?.delta?.content || "";
+              
+              if (counter < 2 && (text.match(/\n/) || []).length) {
+                // Skip prefix characters like "\n\n"
+                return;
+              }
+              
+              if (text) {
+                const queue = encoder.encode(text);
+                controller.enqueue(queue);
+                counter++;
+              }
+            } catch (e) {
+              console.error("Parse error:", e);
+              controller.error(e);
+            }
           }
         }
-      }
 
-      // stream response (SSE) from OpenAI may be fragmented into multiple chunks
-      // this ensures we properly read chunks and invoke an event for each SSE event stream
-      const parser = createParser(onParse);
-      // https://web.dev/streams/#asynchronous-iteration
-      for await (const chunk of res.body as any) {
-        parser.feed(decoder.decode(chunk));
-      }
-    },
-  });
+        const parser = createParser(onParse);
+        
+        try {
+          if (!res.body) {
+            throw new Error("Response body is null");
+          }
+          
+          for await (const chunk of res.body as any) {
+            parser.feed(decoder.decode(chunk));
+          }
+        } catch (error) {
+          console.error("Stream error:", error);
+          controller.error(error);
+        }
+      },
+    });
 
-  return stream;
+    return stream;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    console.error("OpenAI Stream error:", error);
+    throw error;
+  }
 }

@@ -1,17 +1,18 @@
 import { Analytics } from "@vercel/analytics/react";
 import type { AppProps } from "next/app";
-import { NextIntlProvider } from 'next-intl'
+import { IntlProvider } from 'next-intl'
 import "../styles/globals.css";
 import "../styles/markdown.css";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <NextIntlProvider
+    <IntlProvider
       messages={pageProps.messages}
+      locale={pageProps.locale || 'en'}
       >
       <Component {...pageProps} />
       <Analytics />
-    </NextIntlProvider>
+    </IntlProvider>
   );
 }
 

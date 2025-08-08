@@ -200,11 +200,10 @@ const Home: NextPage = () => {
             </span>
             <br></br>
             
-            <br/>
-            <p className="text-slate-500" style={{textAlign: "center"}}>本站支持不多，若无法生成请等待或者联系网站管理员</p>
+
 
             <br/>
-            <p className="text-slate-500" style={{textAlign: "center"}}>由于费用过高，本站一分钟内仅接受 20 次请求，迟迟不能生成周报是因为暂时限流，请在低峰期使用。</p>
+            <p className="text-slate-500" style={{textAlign: "center"}}>有任何问题请联系我的邮箱: guaguaguaxia@Gmail.com</p>
 
           </div>
         </div>
@@ -240,8 +239,7 @@ const Home: NextPage = () => {
                         dangerouslySetInnerHTML={{
                           __html: marked(generatedChat.toString(), {
                             gfm: true,
-                            breaks: true,
-                            smartypants: true
+                            breaks: true
                           }),
                         }}
                       ></p>

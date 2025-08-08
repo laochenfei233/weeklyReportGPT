@@ -5,6 +5,18 @@ class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head>
+          {/* Google tag (gtag.js) */}
+          <script async src="https://www.googletagmanager.com/gtag/js?id=G-F0GCM1QNBF"></script>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'G-F0GCM1QNBF');
+              `,
+            }}
+          />
           <link rel="icon" href="/favicon.ico" />
           <meta
             name="description"
