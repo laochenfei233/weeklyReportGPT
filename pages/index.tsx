@@ -231,90 +231,25 @@ const Home: NextPage = () => {
                       {t('simplifiedContent')}
                     </h2>
                   </div>
-                  <div className="space-y-8 flex flex-col max-w-4xl mx-auto">
-                    <div className="content-container w-full">
-                      {/* 复制按钮区域 */}
-                      <div className="copy-buttons">
-                        <button
-                          onClick={() => {
-                            navigator.clipboard.writeText(generatedChat.trim());
-                            toast("已复制纯文本内容", {
-                              icon: "📋",
-                            });
-                          }}
-                          className="copy-button plain"
-                        >
-                          📋 复制纯文本
-                        </button>
-                        <button
-                          onClick={() => {
-                            try {
-                              // 创建一个临时的div来获取HTML内容
-                              const tempDiv = document.createElement('div');
-                              const htmlContent = marked(generatedChat.toString(), {
-                                gfm: true,
-                                breaks: true
-                              });
-                              
-                              if (typeof htmlContent === 'string') {
-                                tempDiv.innerHTML = htmlContent;
-                              } else {
-                                tempDiv.innerHTML = generatedChat.toString();
-                              }
-                              
-                              // 使用Clipboard API复制HTML格式
-                              const finalHtmlContent = tempDiv.innerHTML;
-                              const plainContent = generatedChat.trim();
-                              
-                              if (navigator.clipboard && window.ClipboardItem) {
-                                const clipboardItem = new ClipboardItem({
-                                  'text/html': new Blob([finalHtmlContent], { type: 'text/html' }),
-                                  'text/plain': new Blob([plainContent], { type: 'text/plain' })
-                                });
-                                navigator.clipboard.write([clipboardItem]).then(() => {
-                                  toast("已复制带格式内容", {
-                                    icon: "✨",
-                                  });
-                                }).catch(() => {
-                                  // 降级到纯文本复制
-                                  navigator.clipboard.writeText(plainContent);
-                                  toast("已复制纯文本内容", {
-                                    icon: "📋",
-                                  });
-                                });
-                              } else {
-                                // 降级到纯文本复制
-                                navigator.clipboard.writeText(plainContent);
-                                toast("已复制纯文本内容", {
-                                  icon: "📋",
-                                });
-                              }
-                            } catch (error) {
-                              // 如果出错，降级到纯文本复制
-                              navigator.clipboard.writeText(generatedChat.trim());
-                              toast("已复制纯文本内容", {
-                                icon: "📋",
-                              });
-                            }
-                          }}
-                          className="copy-button formatted"
-                        >
-                          ✨ 复制带格式
-                        </button>
-                      </div>
-                      
-                      {/* 内容区域 */}
-                      <div className="content-body">
-                        <div
-                          className="markdown-content"
-                          dangerouslySetInnerHTML={{
-                            __html: marked(generatedChat.toString(), {
-                              gfm: true,
-                              breaks: true
-                            }),
-                          }}
-                        />
-                      </div>
+                  <div className="space-y-8 flex flex-col items-center justify-center max-w-xl mx-auto">
+                    <div
+                      className="bg-white rounded-xl shadow-md p-4 hover:bg-gray-100 transition cursor-copy border"
+                      onClick={() => {
+                        navigator.clipboard.writeText(generatedChat.trim());
+                        toast("已复制完整周报内容", {
+                          icon: "✂️",
+                        });
+                      }}
+                    >
+                      <p
+                        className="sty1 markdown-body"
+                        dangerouslySetInnerHTML={{
+                          __html: marked(generatedChat.toString(), {
+                            gfm: true,
+                            breaks: true
+                          }),
+                        }}
+                      />
                     </div>
                   </div>
                 </>
