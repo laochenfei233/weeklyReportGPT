@@ -231,25 +231,36 @@ const Home: NextPage = () => {
                       {t('simplifiedContent')}
                     </h2>
                   </div>
-                  <div className="space-y-8 flex flex-col items-center justify-center max-w-xl mx-auto">
-                    <div
-                      className="bg-white rounded-xl shadow-md p-4 hover:bg-gray-100 transition cursor-copy border"
-                      onClick={() => {
-                        navigator.clipboard.writeText(generatedChat.trim());
-                        toast("已复制完整周报内容", {
-                          icon: "✂️",
-                        });
-                      }}
-                    >
-                      <p
-                        className="sty1 markdown-body"
-                        dangerouslySetInnerHTML={{
-                          __html: marked(generatedChat.toString(), {
-                            gfm: true,
-                            breaks: true
-                          }),
-                        }}
-                      />
+                  <div className="space-y-8 flex flex-col items-center justify-center max-w-4xl mx-auto">
+                    <div className="w-full bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden typora-container">
+                      {/* Typora风格的工具栏 */}
+                      <div className="bg-gray-50 border-b border-gray-200 px-4 py-2 flex justify-between items-center">
+                        <div className="text-sm text-gray-600 font-medium">周报内容</div>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(generatedChat.trim());
+                            toast("已复制完整周报内容", {
+                              icon: "✂️",
+                            });
+                          }}
+                          className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                        >
+                          复制内容
+                        </button>
+                      </div>
+                      
+                      {/* Typora风格的内容区域 */}
+                      <div className="p-8 bg-white min-h-[400px]">
+                        <div
+                          className="sty1 markdown-body"
+                          dangerouslySetInnerHTML={{
+                            __html: marked(generatedChat.toString(), {
+                              gfm: true,
+                              breaks: true
+                            }),
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </>
