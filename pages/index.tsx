@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from 'next-intl'
 import { Toaster, toast } from "react-hot-toast";
 import DropDown, { FormType } from "../components/DropDown";
@@ -22,7 +22,42 @@ const Home: NextPage = () => {
   const [form, setForm] = useState<FormType>("paragraphForm");
   const [api_key, setAPIKey] = useState("")
   const [generatedChat, setGeneratedChat] = useState<String>("");
+  const [renderedHtml, setRenderedHtml] = useState<string>("");
 
+  // 实时渲染markdown内容，带防抖优化
+  useEffect(() => {
+    const renderMarkdown = () => {
+      if (generatedChat) {
+        try {
+          const htmlContent = marked(generatedChat.toString(), {
+            gfm: true,
+            breaks: true
+          });
+          
+          if (typeof htmlContent === 'string') {
+            setRenderedHtml(htmlContent);
+          } else {
+            // 处理Promise情况
+            Promise.resolve(htmlContent).then(result => {
+              setRenderedHtml(typeof result === 'string' ? result : generatedChat.toString());
+            });
+          }
+        } catch (error) {
+          console.error('Real-time markdown rendering error:', error);
+          setRenderedHtml(generatedChat.toString());
+        }
+      } else {
+        setRenderedHtml('');
+      }
+    };
+
+    // 使用requestAnimationFrame来优化渲染性能
+    const timeoutId = setTimeout(() => {
+      requestAnimationFrame(renderMarkdown);
+    }, 50); // 50ms防抖
+
+    return () => clearTimeout(timeoutId);
+  }, [generatedChat]);
 
   console.log("Streamed response: ", generatedChat);
 
@@ -250,16 +285,33 @@ const Home: NextPage = () => {
                       </div>
                       
                       {/* Typora风格的内容区域 */}
-                      <div className="p-8 bg-white min-h-[400px]">
-                        <div
-                          className="sty1 markdown-body"
-                          dangerouslySetInnerHTML={{
-                            __html: marked(generatedChat.toString(), {
-                              gfm: true,
-                              breaks: true
-                            }),
-                          }}
-                        />
+                      <div className="p-8 bg-white min-h-[400px] relative">
+                        {loading && !generatedChat && (
+                          <div className="flex items-center justify-center h-full">
+                            <div className="text-gray-500 flex items-center space-x-2">
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                              <span>正在生成周报...</span>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {renderedHtml && (
+                          <div
+                            className="sty1 markdown-body"
+                            dangerouslySetInnerHTML={{
+                              __html: renderedHtml,
+                            }}
+                          />
+                        )}
+                        
+                        {loading && generatedChat && (
+                          <div className="absolute bottom-4 right-4">
+                            <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center space-x-2">
+                              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-600"></div>
+                              <span>生成中...</span>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
