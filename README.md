@@ -82,21 +82,28 @@ npm run dev
 
 1. Fork 这个项目到你的 GitHub
 2. 在 [Vercel](https://vercel.com) 中导入你的项目
-3. 配置环境变量：
+3. 在 Vercel 项目设置中配置环境变量：
 
 **必需的环境变量：**
-```bash
-OPENAI_API_KEY=your-api-key-here
-NEXT_PUBLIC_USE_USER_KEY=false
-```
+- `OPENAI_API_KEY` = `your-api-key-here`
+- `NEXT_PUBLIC_USE_USER_KEY` = `false`
 
 **可选的环境变量：**
-```bash
-OPENAI_API_BASE=https://api.openai.com/v1
-OPENAI_MODEL=gpt-3.5-turbo
-REQUEST_TIMEOUT=30000
-MAX_TOKENS=2000
-```
+- `OPENAI_API_BASE` = `https://api.openai.com/v1`
+- `OPENAI_MODEL` = `gpt-3.5-turbo`
+- `REQUEST_TIMEOUT` = `30000`
+- `MAX_TOKENS` = `2000`
+
+### 配置步骤
+
+1. 在 Vercel 项目页面，点击 **Settings** 标签
+2. 在左侧菜单中选择 **Environment Variables**
+3. 添加上述环境变量，每个变量分别添加：
+   - **Name**: 变量名（如 `OPENAI_API_KEY`）
+   - **Value**: 变量值（如你的 API 密钥）
+   - **Environment**: 选择 `Production`, `Preview`, `Development`（建议全选）
+4. 点击 **Save** 保存
+5. 重新部署项目
 
 ### 使用脚本部署
 

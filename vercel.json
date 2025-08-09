@@ -3,13 +3,5 @@
     "pages/api/generate.ts": {
       "maxDuration": 30
     }
-  },
-  "env": {
-    "OPENAI_API_KEY": "@openai_api_key",
-    "OPENAI_API_BASE": "@openai_api_base",
-    "OPENAI_MODEL": "@openai_model",
-    "NEXT_PUBLIC_USE_USER_KEY": "@next_public_use_user_key",
-    "REQUEST_TIMEOUT": "@request_timeout",
-    "MAX_TOKENS": "@max_tokens"
   }
 }
