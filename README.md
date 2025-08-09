@@ -23,6 +23,7 @@
 | DeepSeek | `https://api.deepseek.com/v1` | `deepseek-chat`, `deepseek-coder` | DeepSeek AI |
 | Moonshot | `https://api.moonshot.cn/v1` | `moonshot-v1-8k`, `moonshot-v1-32k` | 月之暗面 |
 | 智谱AI | `https://open.bigmodel.cn/api/paas/v4` | `glm-4`, `glm-3-turbo` | 智谱 GLM |
+| 火山引擎 | `https://ark.cn-beijing.volces.com/api/v3/bots/` | `bot-*` | 字节跳动火山引擎 |
 | 自定义 | 自定义URL | 自定义模型 | 任何兼容 OpenAI 格式的API |
 
 ## 🚀 快速开始
@@ -145,6 +146,26 @@ services:
     restart: unless-stopped
 ```
 
+## 🔍 故障排除
+
+如果遇到"服务繁忙，请稍后再试"错误：
+
+1. **检查健康状态**: 访问 `https://your-domain.vercel.app/api/health`
+2. **测试API连接**: 访问 `https://your-domain.vercel.app/api/test` (POST请求)
+3. **查看Vercel日志**: 在Vercel项目页面查看Functions日志
+4. **参考调试指南**: 查看 [DEBUG_GUIDE.md](DEBUG_GUIDE.md)
+
+### 快速修复
+
+如果问题紧急，尝试以下配置：
+```bash
+OPENAI_API_KEY=sk-your-openai-key
+OPENAI_API_BASE=https://api.openai.com/v1
+OPENAI_MODEL=gpt-3.5-turbo
+REQUEST_TIMEOUT=60000
+MAX_TOKENS=1000
+```
+
 ## 🔧 配置说明
 
 ### 环境变量详解
@@ -188,6 +209,13 @@ OPENAI_MODEL=moonshot-v1-8k
 OPENAI_API_KEY=your-zhipu-key
 OPENAI_API_BASE=https://open.bigmodel.cn/api/paas/v4
 OPENAI_MODEL=glm-4
+```
+
+**火山引擎（字节跳动）：**
+```bash
+OPENAI_API_KEY=your-volcengine-key
+OPENAI_API_BASE=https://ark.cn-beijing.volces.com/api/v3/bots/
+OPENAI_MODEL=bot-20250404114220-z2xsd
 ```
 
 <!-- https://www.seotraininglondon.org/gpt3-business-email-generator/ -->

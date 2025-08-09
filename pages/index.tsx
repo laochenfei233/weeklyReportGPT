@@ -71,9 +71,17 @@ const Home: NextPage = () => {
     console.log("Edge function returned.");
 
     if (!response.ok) {
-      toast.error("服务繁忙，请稍后再试")
+      try {
+        const errorData = await response.json();
+        const errorMessage = errorData.error || "服务繁忙，请稍后再试";
+        toast.error(errorMessage);
+        console.error("API Error:", errorData);
+      } catch (e) {
+        toast.error("服务繁忙，请稍后再试");
+        console.error("Failed to parse error response:", e);
+      }
       setLoading(false);
-      return
+      return;
     }
 
     // This data is a ReadableStream

@@ -4,6 +4,7 @@ import {
   ReconnectInterval,
 } from "eventsource-parser";
 import { validateAPIKey, getDefaultModel } from "./apiConfig";
+import { getAPIAdapter } from "./apiAdapters";
 
 export type ChatGPTAgent = "user" | "system" | "assistant";
 
@@ -61,32 +62,40 @@ export async function OpenAIStream(payload: OpenAIStreamPayload) {
   const model = payload.model || config.model;
 
   if (!apiKey) {
-    throw new Error("API key is required");
+    throw new Error("API key is required. Please check your environment variables.");
   }
 
   if (!validateAPIKey(apiKey, baseURL)) {
-    throw new Error("Invalid API key format");
+    throw new Error(`Invalid API key format for ${baseURL}. Please check your API key.`);
   }
+
+  console.log(`Using API: ${baseURL} with model: ${model}`);
+
+  // Get the appropriate adapter for this API
+  const adapter = getAPIAdapter(baseURL);
+  console.log(`Using adapter: ${adapter.name}`);
 
   // Clean payload
   const cleanPayload = { ...payload, model };
   delete cleanPayload.api_key;
 
-  const endpoint = `${baseURL}/chat/completions`;
-  const timeout = parseInt(process.env.REQUEST_TIMEOUT || "30000");
+  // Transform using adapter
+  const endpoint = adapter.transformEndpoint(baseURL, model);
+  const headers = adapter.transformHeaders(apiKey);
+  const transformedPayload = adapter.transformPayload(cleanPayload);
 
+  const timeout = parseInt(process.env.REQUEST_TIMEOUT || "30000");
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
 
+  console.log(`Endpoint: ${endpoint}`);
+  console.log(`Payload:`, JSON.stringify(transformedPayload, null, 2));
+
   try {
     const res = await fetch(endpoint, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-        "User-Agent": "Weekly-Report/1.0.0",
-      },
+      headers,
       method: "POST",
-      body: JSON.stringify(cleanPayload),
+      body: JSON.stringify(transformedPayload),
       signal: controller.signal,
     });
 
@@ -94,7 +103,23 @@ export async function OpenAIStream(payload: OpenAIStreamPayload) {
 
     if (!res.ok) {
       const errorText = await res.text();
-      throw new Error(`API request failed: ${res.status} ${res.statusText} - ${errorText}`);
+      console.error(`API Error: ${res.status} ${res.statusText}`, errorText);
+      
+      let errorMessage = `API request failed: ${res.status} ${res.statusText}`;
+      
+      try {
+        const errorJson = JSON.parse(errorText);
+        if (errorJson.error?.message) {
+          errorMessage = errorJson.error.message;
+        }
+      } catch (e) {
+        // If not JSON, use the raw text
+        if (errorText) {
+          errorMessage = errorText;
+        }
+      }
+      
+      throw new Error(errorMessage);
     }
 
     const stream = new ReadableStream({
@@ -110,7 +135,7 @@ export async function OpenAIStream(payload: OpenAIStreamPayload) {
             
             try {
               const json = JSON.parse(data);
-              const text = json.choices?.[0]?.delta?.content || "";
+              const text = adapter.transformResponse(json);
               
               if (counter < 2 && (text.match(/\n/) || []).length) {
                 // Skip prefix characters like "\n\n"

@@ -68,9 +68,31 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error) {
     console.error("API Error:", error);
     
-    const errorMessage = error instanceof Error ? error.message : "Internal server error";
-    return new Response(JSON.stringify({ error: errorMessage }), {
-      status: 500,
+    let errorMessage = "Internal server error";
+    let statusCode = 500;
+    
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      
+      // Handle specific error types
+      if (error.message.includes("API key")) {
+        statusCode = 401;
+        errorMessage = "API密钥无效或未配置";
+      } else if (error.message.includes("timeout")) {
+        statusCode = 408;
+        errorMessage = "请求超时，请稍后重试";
+      } else if (error.message.includes("API request failed")) {
+        statusCode = 502;
+        errorMessage = "API服务暂时不可用，请稍后重试";
+      }
+    }
+    
+    return new Response(JSON.stringify({ 
+      error: errorMessage,
+      details: error instanceof Error ? error.message : "Unknown error",
+      timestamp: new Date().toISOString()
+    }), {
+      status: statusCode,
       headers: { "Content-Type": "application/json" },
     });
   }

@@ -21,7 +21,8 @@ export function checkEnvironment(): EnvCheckResult {
       const apiKey = process.env.OPENAI_API_KEY;
       
       if (!validateAPIKey(apiKey, baseURL)) {
-        warnings.push("OPENAI_API_KEY format may be invalid for the selected API provider");
+        const { provider, format } = require('./apiConfig').getAPIKeyInfo(apiKey, baseURL);
+        warnings.push(`OPENAI_API_KEY format may be invalid for ${provider}. ${format}. Current key length: ${apiKey.trim().length}`);
       }
     }
   }
