@@ -3,6 +3,8 @@
   color: #374151;
   max-width: none;
   text-align: left;
+  line-height: 1.7;
+  font-size: 16px;
 }
 
 .prose h1 {
@@ -55,12 +57,14 @@
   margin-top: 0.75rem;
   margin-bottom: 0.75rem;
   padding-left: 1.5rem;
+  list-style-type: disc;
 }
 
 .prose ol {
   margin-top: 0.75rem;
   margin-bottom: 0.75rem;
   padding-left: 1.5rem;
+  list-style-type: decimal;
 }
 
 .prose li {
@@ -229,4 +233,43 @@
 
 .content-body * {
   text-align: left !important;
+}
+
+/* 确保markdown元素正确显示 */
+.prose ul li::marker {
+  color: #6b7280;
+}
+
+.prose ol li::marker {
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.prose hr {
+  border-color: #e5e7eb;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.prose a {
+  color: #3b82f6;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.prose a:hover {
+  color: #1d4ed8;
+}
+
+/* 标题间距优化 */
+.prose h1 + p,
+.prose h2 + p,
+.prose h3 + p,
+.prose h4 + p {
+  margin-top: 0.5rem;
+}
+
+/* 列表项间距 */
+.prose li + li {
+  margin-top: 0.5rem;
 }
