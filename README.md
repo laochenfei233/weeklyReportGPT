@@ -32,8 +32,8 @@
 
 1. **克隆项目**
 ```bash
-git clone https://github.com/guaguaguaxia/weekly_report.git
-cd weekly_report
+git clone https://github.com/laochenfei233/weeklyReportGPT.git
+cd weeklyReportGPT
 ```
 
 2. **安装依赖**
@@ -77,7 +77,7 @@ npm run dev
 
 ### 一键部署
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/guaguaguaxia/weekly_report&env=OPENAI_API_KEY,OPENAI_API_BASE,OPENAI_MODEL,NEXT_PUBLIC_USE_USER_KEY&project-name=weekly_report&repo-name=weekly_report)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/laochenfei233/weeklyReportGPT&env=OPENAI_API_KEY,OPENAI_API_BASE,OPENAI_MODEL,NEXT_PUBLIC_USE_USER_KEY&project-name=weeklyReportGPT&repo-name=weeklyReportGPT)
 
 ### 手动部署
 

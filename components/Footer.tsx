@@ -2,32 +2,32 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="text-center h-16 sm:h-20 w-full sm:pt-2 pt-4 border-t mt-5 flex sm:flex-row flex-col justify-between items-center px-3 space-y-3 sm:mb-0 mb-3">
-      <div>
+    <footer className="text-center h-20 sm:h-24 w-full sm:pt-2 pt-4 border-t mt-5 flex sm:flex-row flex-col justify-between items-center px-3 space-y-3 sm:mb-0 mb-3">
+      <div className="text-sm text-gray-600">
         Powered by{" "}
         <a
-          href="https://openai.com/"
+          href="https://github.com/guaguaguaxia"
           target="_blank"
           rel="noreferrer"
-          className="font-bold hover:underline transition underline-offset-2"
+          className="font-bold hover:underline transition underline-offset-2 text-blue-600"
         >
-          OpenAI{" "}
+          guaguaguaxia
         </a>
-        and{" "}
+        {" & "}
         <a
-          href="https://vercel.com/"
+          href="https://xyern.com"
           target="_blank"
           rel="noreferrer"
-          className="font-bold hover:underline transition underline-offset-2"
+          className="font-bold hover:underline transition underline-offset-2 text-blue-600"
         >
-          Vercel Edge Functions.
+          laochenfei233
         </a>
       </div>
       <div className="flex space-x-4 pb-4 sm:pb-0">
         <Link
-          href="https://github.com/guaguaguaxia/weekly_report"
+          href="https://github.com/laochenfei233/weeklyReportGPT"
           className="group"
-          aria-label="TaxPal on GitHub"
+          aria-label="Weekly Report GPT on GitHub"
         >
           <svg
             aria-hidden="true"

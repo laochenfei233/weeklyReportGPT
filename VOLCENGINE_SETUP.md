@@ -63,26 +63,54 @@ https://ark.cn-beijing.volces.com/api/v3/bots/{bot_id}/chat/completions
    POST https://your-domain.vercel.app/api/test
    ```
 
+4. **火山引擎深度调试**
+   ```
+   POST https://your-domain.vercel.app/api/volcengine-debug
+   ```
+
+5. **配置文档检查**
+   ```
+   GET https://your-domain.vercel.app/api/check-volcengine-docs
+   ```
+
 ### 🔍 常见问题
 
-#### 问题1: Bot ID 格式错误
+#### 问题1: Bot ID 格式错误 (404 Not Found)
 **症状**: API调用失败，返回404错误
+**原因**: Bot ID格式不正确或Bot不存在
 **解决**: 
-- 确认Bot ID格式正确
-- 在火山引擎控制台验证Bot是否存在且可用
+1. 确认Bot ID格式: `bot-YYYYMMDDHHMMSS-XXXXX`
+2. 在火山引擎控制台验证Bot是否存在
+3. 检查Bot状态是否为"已发布"或"活跃"
+4. 使用 `/api/check-volcengine-docs` 验证配置
 
-#### 问题2: API密钥无效
+#### 问题2: API密钥无效 (401 Unauthorized)
 **症状**: 返回401认证错误
 **解决**:
-- 检查API密钥是否正确
-- 确认密钥对应的Bot是否有权限
+1. 检查API密钥是否正确复制
+2. 确认密钥对应的账户有权限访问该Bot
+3. 检查密钥是否已过期
+4. 在火山引擎控制台重新生成密钥
 
-#### 问题3: 区域配置错误
-**症状**: 网络连接失败
+#### 问题3: 区域配置错误 (网络错误)
+**症状**: 网络连接失败或超时
 **解决**:
-- 确认使用正确的区域端点
-- 北京区域: `ark.cn-beijing.volces.com`
-- 其他区域请查看火山引擎文档
+1. 确认使用正确的区域端点
+   - 北京区域: `ark.cn-beijing.volces.com`
+   - 新加坡区域: `ark.ap-singapore-1.volces.com`
+2. 检查网络连接
+3. 确认防火墙设置
+
+#### 问题4: Bot状态问题 (404 Not Found)
+**症状**: Bot ID正确但仍返回404
+**可能原因**:
+1. Bot未发布或已停用
+2. Bot在不同的区域
+3. API密钥权限不足
+**解决**:
+1. 在火山引擎控制台检查Bot状态
+2. 确保Bot已发布且处于活跃状态
+3. 检查API密钥的权限范围
 
 ### 📝 配置示例
 
