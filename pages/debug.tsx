@@ -153,6 +153,55 @@ export default function DebugPage() {
     setLoading(false);
   };
 
+  const testMarkdown = async () => {
+    setLoading(true);
+    
+    const testText = `# 测试标题
+## 二级标题
+这是一个段落。
+
+- 列表项1
+- 列表项2
+- **粗体文本**
+
+1. 有序列表1
+2. 有序列表2
+
+\`代码块\`
+
+> 引用文本`;
+
+    try {
+      const response = await fetch('/api/test-markdown', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: testText }),
+      });
+
+      const data = await response.json();
+      
+      setResults(prev => [...prev, {
+        endpoint: '/api/test-markdown',
+        method: 'POST',
+        status: response.status,
+        data,
+        error: response.ok ? undefined : data.error
+      }]);
+    } catch (error) {
+      setResults(prev => [...prev, {
+        endpoint: '/api/test-markdown',
+        method: 'POST',
+        status: 0,
+        data: null,
+        error: error instanceof Error ? error.message : 'Network error'
+      }]);
+    }
+
+    setLoading(false);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <Head>
@@ -185,6 +234,13 @@ export default function DebugPage() {
               className="bg-orange-500 hover:bg-orange-600 disabled:bg-gray-400 text-white px-4 py-2 rounded"
             >
               火山引擎深度调试
+            </button>
+            <button
+              onClick={testMarkdown}
+              disabled={loading}
+              className="bg-purple-500 hover:bg-purple-600 disabled:bg-gray-400 text-white px-4 py-2 rounded"
+            >
+              测试Markdown渲染
             </button>
           </div>
         </div>

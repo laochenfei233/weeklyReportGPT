@@ -26,20 +26,41 @@ const Home: NextPage = () => {
 
   // 当generatedChat改变时，渲染markdown
   useEffect(() => {
-    if (generatedChat) {
+    if (generatedChat && generatedChat.length > 0) {
       const renderMarkdown = async () => {
         try {
-          const result = await marked(generatedChat.toString(), {
+          console.log('Rendering markdown:', generatedChat.toString());
+          
+          // 配置marked选项
+          const markedOptions = {
             gfm: true,
-            breaks: true
-          });
-          setRenderedHtml(typeof result === 'string' ? result : '');
+            breaks: true,
+            sanitize: false,
+            smartLists: true,
+            smartypants: false
+          };
+          
+          // 尝试同步渲染
+          const result = marked.parse(generatedChat.toString(), markedOptions);
+          console.log('Rendered HTML:', result);
+          
+          if (typeof result === 'string') {
+            setRenderedHtml(result);
+          } else if (result instanceof Promise) {
+            const resolvedResult = await result;
+            setRenderedHtml(typeof resolvedResult === 'string' ? resolvedResult : generatedChat.toString());
+          } else {
+            setRenderedHtml(generatedChat.toString());
+          }
         } catch (error) {
           console.error('Markdown rendering error:', error);
-          setRenderedHtml(generatedChat.toString());
+          // 如果渲染失败，至少显示原始内容
+          setRenderedHtml(`<pre>${generatedChat.toString()}</pre>`);
         }
       };
       renderMarkdown();
+    } else {
+      setRenderedHtml('');
     }
   }, [generatedChat]);
 
