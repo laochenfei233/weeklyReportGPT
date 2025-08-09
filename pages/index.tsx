@@ -230,8 +230,7 @@ const Home: NextPage = () => {
             
 
 
-            <br/>
-            <p className="text-slate-500" style={{textAlign: "center"}}>有任何问题请联系我的邮箱: guaguaguaxia@Gmail.com</p>
+
 
           </div>
         </div>
@@ -251,7 +250,7 @@ const Home: NextPage = () => {
                       {t('simplifiedContent')}
                     </h2>
                   </div>
-                  <div className="space-y-8 flex flex-col items-center justify-center max-w-4xl mx-auto">
+                  <div className="space-y-8 flex flex-col max-w-4xl mx-auto">
                     <div className="content-container w-full">
                       {/* 复制按钮区域 */}
                       <div className="copy-buttons">
