@@ -49,6 +49,7 @@ export default function DebugPage() {
     const tests = [
       { endpoint: '/api/health', method: 'GET' },
       { endpoint: '/api/validate-key', method: 'GET' },
+      { endpoint: '/api/test-endpoint', method: 'GET' },
       { endpoint: '/api/test', method: 'POST' },
     ];
 

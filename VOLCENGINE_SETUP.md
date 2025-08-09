@@ -12,9 +12,18 @@
    - 获取API密钥
 
 2. **配置环境变量**
+   
+   **方式一：baseURL包含bots路径（推荐）**
    ```bash
    OPENAI_API_KEY=your-volcengine-api-key
    OPENAI_API_BASE=https://ark.cn-beijing.volces.com/api/v3/bots/
+   OPENAI_MODEL=bot-20250404114220-z2xsd
+   ```
+   
+   **方式二：baseURL不包含bots路径**
+   ```bash
+   OPENAI_API_KEY=your-volcengine-api-key
+   OPENAI_API_BASE=https://ark.cn-beijing.volces.com/api/v3
    OPENAI_MODEL=bot-20250404114220-z2xsd
    ```
 
@@ -22,6 +31,7 @@
    - `OPENAI_MODEL` 应该设置为你的Bot ID
    - 格式通常为: `bot-yyyymmddhhmmss-xxxxx`
    - 可以在火山引擎控制台中找到
+   - 最终端点会是: `https://ark.cn-beijing.volces.com/api/v3/bots/bot-20250404114220-z2xsd/chat/completions`
 
 ### 🔧 API 端点格式
 
