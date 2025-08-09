@@ -150,10 +150,12 @@ services:
 
 如果遇到"服务繁忙，请稍后再试"错误：
 
-1. **检查健康状态**: 访问 `https://your-domain.vercel.app/api/health`
-2. **测试API连接**: 访问 `https://your-domain.vercel.app/api/test` (POST请求)
-3. **查看Vercel日志**: 在Vercel项目页面查看Functions日志
-4. **参考调试指南**: 查看 [DEBUG_GUIDE.md](DEBUG_GUIDE.md)
+1. **使用调试页面**: 访问 `https://your-domain.vercel.app/debug` 进行可视化测试
+2. **检查健康状态**: 访问 `https://your-domain.vercel.app/api/health` (GET)
+3. **验证API密钥**: 访问 `https://your-domain.vercel.app/api/validate-key` (GET)
+4. **测试API连接**: 访问 `https://your-domain.vercel.app/api/test` (POST)
+5. **查看Vercel日志**: 在Vercel项目页面查看Functions日志
+6. **参考调试指南**: 查看 [DEBUG_GUIDE.md](DEBUG_GUIDE.md)
 
 ### 快速修复
 

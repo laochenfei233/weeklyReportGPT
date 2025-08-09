@@ -16,31 +16,46 @@ https://your-domain.vercel.app/api/health
 - API密钥是否存在
 - 配置验证结果
 
-### 2. 验证API密钥
+### 2. 使用调试页面（推荐）
 
-访问密钥验证端点：
+访问调试页面进行可视化测试：
 ```
-https://your-domain.vercel.app/api/validate-key
-```
-
-这会显示：
-- API密钥格式是否正确
-- 检测到的API提供商
-- 密钥长度和格式信息
-- 修复建议
-
-### 3. 测试API连接
-
-访问测试端点：
-```
-POST https://your-domain.vercel.app/api/test
+https://your-domain.vercel.app/debug
 ```
 
-或者在浏览器开发者工具中运行：
+这个页面提供：
+- 一键运行所有基础测试
+- 可视化的测试结果
+- 详细的错误信息
+- 周报生成功能测试
+
+### 3. 手动测试各个端点
+
+#### 健康检查 (GET)
+```bash
+curl https://your-domain.vercel.app/api/health
+```
+
+#### 验证API密钥 (GET)
+```bash
+curl https://your-domain.vercel.app/api/validate-key
+```
+
+#### 测试API连接 (POST)
+```bash
+curl -X POST https://your-domain.vercel.app/api/test
+```
+
+#### 浏览器开发者工具测试
 ```javascript
-fetch('/api/test', { method: 'POST' })
-  .then(res => res.json())
-  .then(data => console.log(data));
+// 健康检查
+fetch('/api/health').then(res => res.json()).then(console.log);
+
+// 验证密钥
+fetch('/api/validate-key').then(res => res.json()).then(console.log);
+
+// 测试API
+fetch('/api/test', { method: 'POST' }).then(res => res.json()).then(console.log);
 ```
 
 ### 3. 检查Vercel日志
