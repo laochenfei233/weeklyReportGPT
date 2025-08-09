@@ -31,8 +31,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   };
 
   // 可能的问题和建议
-  const issues = [];
-  const suggestions = [];
+  const issues: string[] = [];
+  const suggestions: string[] = [];
 
   if (!botIdAnalysis.isValid) {
     issues.push('Bot ID format may be incorrect');

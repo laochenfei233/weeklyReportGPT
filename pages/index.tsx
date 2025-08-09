@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from 'next-intl'
 import { Toaster, toast } from "react-hot-toast";
 import DropDown, { FormType } from "../components/DropDown";
@@ -22,6 +22,26 @@ const Home: NextPage = () => {
   const [form, setForm] = useState<FormType>("paragraphForm");
   const [api_key, setAPIKey] = useState("")
   const [generatedChat, setGeneratedChat] = useState<String>("");
+  const [renderedHtml, setRenderedHtml] = useState<string>("");
+
+  // 当generatedChat改变时，渲染markdown
+  useEffect(() => {
+    if (generatedChat) {
+      const renderMarkdown = async () => {
+        try {
+          const result = await marked(generatedChat.toString(), {
+            gfm: true,
+            breaks: true
+          });
+          setRenderedHtml(typeof result === 'string' ? result : '');
+        } catch (error) {
+          console.error('Markdown rendering error:', error);
+          setRenderedHtml(generatedChat.toString());
+        }
+      };
+      renderMarkdown();
+    }
+  }, [generatedChat]);
 
   console.log("Streamed response: ", generatedChat);
 
@@ -247,39 +267,46 @@ const Home: NextPage = () => {
                           📋 复制纯文本
                         </button>
                         <button
-                          onClick={() => {
-                            // 创建一个临时的div来获取HTML内容
-                            const tempDiv = document.createElement('div');
-                            tempDiv.innerHTML = marked(generatedChat.toString(), {
-                              gfm: true,
-                              breaks: true,
-                              headerIds: false,
-                              mangle: false
-                            });
-                            
-                            // 使用Clipboard API复制HTML格式
-                            const htmlContent = tempDiv.innerHTML;
-                            const plainContent = generatedChat.trim();
-                            
-                            if (navigator.clipboard && window.ClipboardItem) {
-                              const clipboardItem = new ClipboardItem({
-                                'text/html': new Blob([htmlContent], { type: 'text/html' }),
-                                'text/plain': new Blob([plainContent], { type: 'text/plain' })
+                          onClick={async () => {
+                            try {
+                              // 创建一个临时的div来获取HTML内容
+                              const tempDiv = document.createElement('div');
+                              const markedResult = await marked(generatedChat.toString(), {
+                                gfm: true,
+                                breaks: true
                               });
-                              navigator.clipboard.write([clipboardItem]).then(() => {
-                                toast("已复制带格式内容", {
-                                  icon: "✨",
+                              tempDiv.innerHTML = typeof markedResult === 'string' ? markedResult : '';
+                              
+                              // 使用Clipboard API复制HTML格式
+                              const htmlContent = tempDiv.innerHTML;
+                              const plainContent = generatedChat.trim();
+                              
+                              if (navigator.clipboard && window.ClipboardItem) {
+                                const clipboardItem = new ClipboardItem({
+                                  'text/html': new Blob([htmlContent], { type: 'text/html' }),
+                                  'text/plain': new Blob([plainContent], { type: 'text/plain' })
                                 });
-                              }).catch(() => {
+                                navigator.clipboard.write([clipboardItem]).then(() => {
+                                  toast("已复制带格式内容", {
+                                    icon: "✨",
+                                  });
+                                }).catch(() => {
+                                  // 降级到纯文本复制
+                                  navigator.clipboard.writeText(plainContent);
+                                  toast("已复制纯文本内容", {
+                                    icon: "📋",
+                                  });
+                                });
+                              } else {
                                 // 降级到纯文本复制
                                 navigator.clipboard.writeText(plainContent);
                                 toast("已复制纯文本内容", {
                                   icon: "📋",
                                 });
-                              });
-                            } else {
-                              // 降级到纯文本复制
-                              navigator.clipboard.writeText(plainContent);
+                              }
+                            } catch (error) {
+                              // 如果出错，降级到纯文本复制
+                              navigator.clipboard.writeText(generatedChat.trim());
                               toast("已复制纯文本内容", {
                                 icon: "📋",
                               });
@@ -296,12 +323,7 @@ const Home: NextPage = () => {
                         <div
                           className="prose"
                           dangerouslySetInnerHTML={{
-                            __html: marked(generatedChat.toString(), {
-                              gfm: true,
-                              breaks: true,
-                              headerIds: false,
-                              mangle: false
-                            }),
+                            __html: renderedHtml,
                           }}
                         />
                       </div>

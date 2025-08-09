@@ -1,5 +1,15 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
+interface TestResult {
+  endpoint: string;
+  status: number;
+  statusText: string;
+  success: boolean;
+  response?: string;
+  headers?: Record<string, string>;
+  error?: string;
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -31,7 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       `${apiBase.replace(/\/bots\/$/, '')}/chat/completions`,
     ];
 
-    const results = [];
+    const results: TestResult[] = [];
 
     for (const endpoint of endpointVariations) {
       try {
