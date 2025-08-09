@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslations } from 'next-intl'
 import { Toaster, toast } from "react-hot-toast";
 import DropDown, { FormType } from "../components/DropDown";
@@ -22,47 +22,7 @@ const Home: NextPage = () => {
   const [form, setForm] = useState<FormType>("paragraphForm");
   const [api_key, setAPIKey] = useState("")
   const [generatedChat, setGeneratedChat] = useState<String>("");
-  const [renderedHtml, setRenderedHtml] = useState<string>("");
 
-  // 当generatedChat改变时，渲染markdown
-  useEffect(() => {
-    if (generatedChat && generatedChat.length > 0) {
-      const renderMarkdown = async () => {
-        try {
-          console.log('Rendering markdown:', generatedChat.toString());
-          
-          // 配置marked选项
-          const markedOptions = {
-            gfm: true,
-            breaks: true,
-            sanitize: false,
-            smartLists: true,
-            smartypants: false
-          };
-          
-          // 尝试同步渲染
-          const result = marked.parse(generatedChat.toString(), markedOptions);
-          console.log('Rendered HTML:', result);
-          
-          if (typeof result === 'string') {
-            setRenderedHtml(result);
-          } else if (result instanceof Promise) {
-            const resolvedResult = await result;
-            setRenderedHtml(typeof resolvedResult === 'string' ? resolvedResult : generatedChat.toString());
-          } else {
-            setRenderedHtml(generatedChat.toString());
-          }
-        } catch (error) {
-          console.error('Markdown rendering error:', error);
-          // 如果渲染失败，至少显示原始内容
-          setRenderedHtml(`<pre>${generatedChat.toString()}</pre>`);
-        }
-      };
-      renderMarkdown();
-    } else {
-      setRenderedHtml('');
-    }
-  }, [generatedChat]);
 
   console.log("Streamed response: ", generatedChat);
 
@@ -287,23 +247,28 @@ const Home: NextPage = () => {
                           📋 复制纯文本
                         </button>
                         <button
-                          onClick={async () => {
+                          onClick={() => {
                             try {
                               // 创建一个临时的div来获取HTML内容
                               const tempDiv = document.createElement('div');
-                              const markedResult = await marked(generatedChat.toString(), {
+                              const htmlContent = marked(generatedChat.toString(), {
                                 gfm: true,
                                 breaks: true
                               });
-                              tempDiv.innerHTML = typeof markedResult === 'string' ? markedResult : '';
+                              
+                              if (typeof htmlContent === 'string') {
+                                tempDiv.innerHTML = htmlContent;
+                              } else {
+                                tempDiv.innerHTML = generatedChat.toString();
+                              }
                               
                               // 使用Clipboard API复制HTML格式
-                              const htmlContent = tempDiv.innerHTML;
+                              const finalHtmlContent = tempDiv.innerHTML;
                               const plainContent = generatedChat.trim();
                               
                               if (navigator.clipboard && window.ClipboardItem) {
                                 const clipboardItem = new ClipboardItem({
-                                  'text/html': new Blob([htmlContent], { type: 'text/html' }),
+                                  'text/html': new Blob([finalHtmlContent], { type: 'text/html' }),
                                   'text/plain': new Blob([plainContent], { type: 'text/plain' })
                                 });
                                 navigator.clipboard.write([clipboardItem]).then(() => {
@@ -341,9 +306,12 @@ const Home: NextPage = () => {
                       {/* 内容区域 */}
                       <div className="content-body">
                         <div
-                          className="prose"
+                          className="markdown-content"
                           dangerouslySetInnerHTML={{
-                            __html: renderedHtml,
+                            __html: marked(generatedChat.toString(), {
+                              gfm: true,
+                              breaks: true
+                            }),
                           }}
                         />
                       </div>

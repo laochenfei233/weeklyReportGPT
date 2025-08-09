@@ -1,70 +1,80 @@
-/* 自定义 Prose 样式 */
-.prose {
-  color: #374151;
-  max-width: none;
+/* 简化的markdown样式 - 靠左对齐 */
+.markdown-content {
   text-align: left;
   line-height: 1.6;
+  color: #374151;
 }
 
-/* 确保markdown元素正确显示 */
-.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4 {
   font-weight: bold;
   margin-top: 1.5em;
   margin-bottom: 0.5em;
+  text-align: left;
 }
 
-.prose h1 { font-size: 2em; }
-.prose h2 { font-size: 1.5em; }
-.prose h3 { font-size: 1.25em; }
+.markdown-content h1 { font-size: 1.875rem; }
+.markdown-content h2 { font-size: 1.5rem; }
+.markdown-content h3 { font-size: 1.25rem; }
+.markdown-content h4 { font-size: 1.125rem; }
 
-.prose ul, .prose ol {
+.markdown-content p {
+  margin: 1em 0;
+  text-align: left;
+}
+
+.markdown-content ul,
+.markdown-content ol {
   margin: 1em 0;
   padding-left: 2em;
+  text-align: left;
 }
 
-.prose ul {
+.markdown-content ul {
   list-style-type: disc;
 }
 
-.prose ol {
+.markdown-content ol {
   list-style-type: decimal;
 }
 
-.prose li {
+.markdown-content li {
   margin: 0.25em 0;
+  text-align: left;
 }
 
-.prose p {
-  margin: 1em 0;
-}
-
-.prose strong {
+.markdown-content strong {
   font-weight: bold;
 }
 
-.prose em {
+.markdown-content em {
   font-style: italic;
 }
 
-.prose code {
+.markdown-content code {
   background-color: #f3f4f6;
   padding: 0.125em 0.25em;
   border-radius: 0.25em;
   font-family: monospace;
+  font-size: 0.875em;
 }
 
-.prose pre {
+.markdown-content pre {
   background-color: #f3f4f6;
   padding: 1em;
   border-radius: 0.5em;
   overflow-x: auto;
+  margin: 1em 0;
 }
 
-.prose blockquote {
+.markdown-content blockquote {
   border-left: 4px solid #e5e7eb;
   padding-left: 1em;
   margin: 1em 0;
   font-style: italic;
+  color: #6b7280;
 }
 
 .prose h1 {
@@ -282,4 +292,5 @@
 
 .content-body {
   padding: 1.5rem;
+  text-align: left;
 }
