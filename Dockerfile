@@ -1,61 +1,53 @@
+# 使用官方Node.js运行时作为基础镜像
 FROM node:18-alpine AS base
 
-# Install dependencies only when needed
-FROM base AS deps
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
+# 设置工作目录
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
-RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm i --frozen-lockfile; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
+# 复制package.json和package-lock.json
+COPY package*.json ./
 
+# 安装依赖
+RUN npm ci --only=production && npm cache clean --force
 
-# Rebuild the source code only when needed
-FROM base AS builder
+# 构建阶段
+FROM node:18-alpine AS builder
 WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+
+# 复制package文件
+COPY package*.json ./
+
+# 安装所有依赖（包括开发依赖）
+RUN npm ci
+
+# 复制源代码
 COPY . .
 
-# Next.js collects completely anonymous telemetry data about general usage.
-# Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry during the build.
-# ENV NEXT_TELEMETRY_DISABLED 1
+# 构建应用
+RUN npm run build
 
-COPY ./.env.example ./.env
-RUN sed -i "s/OPENAPI_API_Key=/OPENAPI_API_Key=$OPENAPI_API_Key/g" .env
-RUN yarn build
-
-# If using npm comment out above and use below instead
-# RUN npm run build
-
-# Production image, copy all the files and run next
-FROM base AS runner
+# 生产阶段
+FROM node:18-alpine AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
-# Uncomment the following line in case you want to disable telemetry during runtime.
-# ENV NEXT_TELEMETRY_DISABLED 1
-
+# 创建非root用户
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
+# 复制必要文件
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
+# 设置正确的权限
 USER nextjs
 
+# 暴露端口
 EXPOSE 3000
 
+# 设置环境变量
 ENV PORT 3000
+ENV NODE_ENV production
 
+# 启动应用
 CMD ["node", "server.js"]

@@ -120,38 +120,7 @@ export default function DebugPage() {
     setLoading(false);
   };
 
-  const testVolcengine = async () => {
-    setLoading(true);
-    
-    try {
-      const response = await fetch('/api/volcengine-debug', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
 
-      const data = await response.json();
-      
-      setResults(prev => [...prev, {
-        endpoint: '/api/volcengine-debug',
-        method: 'POST',
-        status: response.status,
-        data,
-        error: response.ok ? undefined : data.error
-      }]);
-    } catch (error) {
-      setResults(prev => [...prev, {
-        endpoint: '/api/volcengine-debug',
-        method: 'POST',
-        status: 0,
-        data: null,
-        error: error instanceof Error ? error.message : 'Network error'
-      }]);
-    }
-
-    setLoading(false);
-  };
 
   const testMarkdown = async () => {
     setLoading(true);
@@ -227,13 +196,6 @@ export default function DebugPage() {
               className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white px-4 py-2 rounded"
             >
               测试周报生成
-            </button>
-            <button
-              onClick={testVolcengine}
-              disabled={loading}
-              className="bg-orange-500 hover:bg-orange-600 disabled:bg-gray-400 text-white px-4 py-2 rounded"
-            >
-              火山引擎深度调试
             </button>
             <button
               onClick={testMarkdown}

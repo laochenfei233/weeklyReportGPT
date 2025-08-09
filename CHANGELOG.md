@@ -1,191 +1,90 @@
 # 更新日志
 
-## [2.1.8] - 2025-01-09
-
-### ⚡ 实时Markdown渲染
-
-- **即时解析渲染**: 内容生成过程中实时解析并渲染markdown，无需手动切换预览
-- **性能优化**: 
-  - 使用防抖技术避免过度渲染
-  - requestAnimationFrame优化渲染性能
-  - 50ms防抖延迟平衡性能和体验
-- **视觉反馈**: 
-  - 生成前显示加载状态
-  - 生成中显示进度指示器
-  - 平滑的内容更新动画
-- **用户体验**: 
-  - 类似Typora的所见即所得体验
-  - 内容淡入动画效果
-  - 平滑的过渡动画
-
-## [2.1.7] - 2025-01-09
-
-### 🎨 Typora风格渲染
-
-- **Typora风格样式**: 完全重新设计markdown渲染样式，模仿Typora编辑器
-- **优雅的排版**: 改进字体、行高、间距，提供更好的阅读体验
-- **编辑器界面**: 添加类似Typora的工具栏和容器设计
-- **细节优化**: 
-  - 标题下划线和层级样式
-  - 代码块和行内代码的精美样式
-  - 列表和引用的优化间距
-  - 表格的响应式设计
-  - 选中文本的高亮效果
-
-## [2.1.6] - 2025-01-09
-
-### 🔄 完全回退到最早版本
-
-- **恢复原始结构**: 回到最早的单一容器布局
-- **移除复制按钮**: 恢复到点击整个区域复制的方式
-- **简化样式**: 移除所有复杂的prose和markdown-content样式
-- **原始渲染**: 使用最早的markdown-body类和sty1样式
-
-## [2.1.5] - 2025-01-09
-
-### 🔄 Markdown渲染重构
-
-- **简化渲染逻辑**: 回到最基础的marked()直接渲染方式，移除复杂的useEffect
-- **左对齐布局**: 所有markdown内容现在完全左对齐显示
-- **样式重构**: 使用`.markdown-content`类替代`.prose`，样式更简洁
-- **性能优化**: 移除异步渲染，直接在组件渲染时处理markdown
-
-## [2.1.4] - 2025-01-09
-
-### 🔧 Markdown渲染修复
-
-- **修复渲染问题**: 解决markdown内容显示原始语法（###等）而不是渲染后HTML的问题
-- **改进渲染逻辑**: 使用marked.parse()方法，添加错误处理和调试日志
-- **增强样式支持**: 添加完整的markdown元素样式（标题、列表、代码块等）
-- **新增调试工具**: 添加markdown渲染测试API和调试页面功能
-
-## [2.1.3] - 2025-01-09
-
-### 🔄 样式回滚
-
-- **背景色回滚**: 移除渐变背景，恢复到默认背景
-- **Markdown样式简化**: 回滚到基础的左对齐样式，移除复杂的样式规则
-- **保留Footer优化**: 保持统一的字体大小和颜色设置
-
-## [2.1.2] - 2025-01-09
-
-### 🎨 UI/UX 进一步优化
-
-- **背景色修复**: 添加渐变背景色，与原版语言底色保持一致
-- **Footer样式统一**: Powered by和Supported by字体大小一致，颜色统一
-- **Footer布局优化**: 在所有屏幕尺寸下都采用垂直布局
-- **Markdown渲染增强**: 
-  - 优化列表样式，正确显示项目符号和编号
-  - 改进标题和段落间距
-  - 添加链接样式和悬停效果
-  - 优化代码块和引用样式
-
-## [2.1.1] - 2025-01-09
-
-### 🎨 UI/UX 微调
-
-- **内容对齐优化**: Markdown渲染内容现在完全左对齐显示
-- **Footer更新**: 添加Claude Sonnet 4.0和Kiro的支持信息
-- **界面清理**: 移除了邮箱联系信息，界面更简洁
-
-## [2.1.0] - 2025-01-09
-
-### 🎨 UI/UX 改进
-
-- **Markdown渲染优化**: 周报内容现在以更美观的markdown格式显示
-- **双重复制功能**: 新增"复制纯文本"和"复制带格式"两种复制选项
-- **自定义样式**: 优化了内容显示的排版和样式
-- **响应式设计**: 改进了在不同设备上的显示效果
-
-### 🔗 链接更新
-
-- **GitHub仓库**: 更新为 `https://github.com/laochenfei233/weeklyReportGPT`
-- **贡献者信息**: 更新Footer显示贡献者信息
-- **部署链接**: 更新所有Vercel部署按钮链接
-
-### 📦 依赖更新
-
-- 新增 `@tailwindcss/typography` 插件
-- 优化Tailwind CSS配置
-- 新增自定义prose样式
-
----
-
-## [2.0.0] - 2025-01-08
+## [2.0.0] - 2025-01-09
 
 ### 🎉 重大更新
 
-- **多API源支持**: 新增对 DeepSeek、Moonshot、智谱AI 等多种 OpenAI 兼容 API 的支持
-- **Node.js 22 兼容**: 升级所有依赖包，完全支持 Node.js 22
-- **环境变量配置**: 通过环境变量灵活配置 API 源、模型和参数
+基于原版项目 [guaguaguaxia/weekly_report](https://github.com/guaguaguaxia/weekly_report) 进行全面升级和优化。
 
-### ✨ 新特性
+### 🚀 核心功能升级
 
-- 新增 `utils/apiConfig.ts` - API 提供商配置管理
-- 新增 `utils/envCheck.ts` - 环境变量验证工具
-- 新增 `scripts/deploy.sh` - 自动化部署脚本
-- 支持多个 API 密钥负载均衡（逗号分隔）
-- 增强的错误处理和超时控制
-- 完善的 TypeScript 类型定义
+- **多API源支持**: 支持 OpenAI、DeepSeek、Moonshot、智谱AI、火山引擎等多种API源
+- **实时Markdown渲染**: 类似Typora的所见即所得体验，内容生成过程中实时渲染
+- **Typora风格界面**: 优雅的编辑器界面设计，专业的文档排版效果
+- **Node.js 22兼容**: 升级所有依赖包，支持最新版本
 
-### 🔧 改进
+### ✨ 用户体验改进
 
-- 升级 Next.js 到 15.x
-- 升级 React 到 18.3.x
-- 升级 TypeScript 到 5.7.x
-- 优化 API 请求流处理
-- 改进错误信息和日志记录
-- 增强 Vercel 部署配置
+- **即时预览**: 无需手动切换，生成过程中即可看到最终排版效果
+- **优雅排版**: 
+  - 标题层级和下划线样式
+  - 列表、引用、代码块的精美样式
+  - 表格的响应式设计
+  - 平滑的动画过渡效果
+- **智能复制**: 支持纯文本和带格式两种复制方式
+- **加载反馈**: 清晰的生成状态指示和进度反馈
 
-### 🐛 修复
+### 🔧 技术架构升级
 
-- 修复流式响应的解析错误
-- 修复 API 密钥验证逻辑
-- 修复超时处理机制
-- 优化内存使用
+- **环境变量配置**: 通过环境变量灵活配置API源和参数
+- **错误处理增强**: 完善的错误处理和超时控制机制
+- **调试工具**: 内置调试页面和健康检查API
+- **性能优化**: 
+  - 防抖技术避免过度渲染
+  - requestAnimationFrame优化渲染性能
+  - 智能缓存和状态管理
 
-### 📚 文档
+### 📦 依赖和配置
 
-- 更新 README 文档，添加详细的配置说明
-- 新增多种 API 源的配置示例
-- 完善部署指南
-- 添加环境变量说明表格
+- Next.js 15.x
+- React 18.3.x  
+- TypeScript 5.7.x
+- Tailwind CSS 3.4.x
+- Marked 14.x (Markdown解析)
+- 新增 @tailwindcss/typography 插件
 
-### 🔄 迁移指南
+### 🌐 部署支持
 
-从 1.x 版本升级到 2.0：
+- **Vercel**: 完美兼容，一键部署
+- **Docker**: 支持容器化部署
+- **环境变量**: 灵活的配置管理
+- **多区域**: 支持不同API服务商的区域配置
 
-1. 更新 `.env` 文件，添加新的环境变量：
-   ```bash
-   OPENAI_API_BASE=https://api.openai.com/v1
-   OPENAI_MODEL=gpt-3.5-turbo
-   REQUEST_TIMEOUT=30000
-   MAX_TOKENS=2000
-   ```
+### 🔗 链接更新
 
-2. 如果使用其他 API 源，更新相应的配置：
-   ```bash
-   # 例如使用 DeepSeek
-   OPENAI_API_BASE=https://api.deepseek.com/v1
-   OPENAI_MODEL=deepseek-chat
-   ```
+- **项目仓库**: https://github.com/laochenfei233/weeklyReportGPT
+- **原版项目**: https://github.com/guaguaguaxia/weekly_report
+- **贡献者**: guaguaguaxia & laochenfei233
+- **技术支持**: Claude Sonnet 4.0 & Kiro
 
-3. 重新安装依赖：
-   ```bash
-   npm install
-   ```
+### 📋 配置示例
 
-### 🚀 部署
+```bash
+# OpenAI官方
+OPENAI_API_KEY=sk-your-openai-key
+OPENAI_API_BASE=https://api.openai.com/v1
+OPENAI_MODEL=gpt-3.5-turbo
 
-- 保持与 Vercel 的完美兼容
-- 支持 Docker 部署
-- 新增部署检查脚本
+# DeepSeek
+OPENAI_API_KEY=sk-your-deepseek-key
+OPENAI_API_BASE=https://api.deepseek.com/v1
+OPENAI_MODEL=deepseek-chat
+
+# 火山引擎
+OPENAI_API_KEY=your-volcengine-key
+OPENAI_API_BASE=https://ark.cn-beijing.volces.com/api/v3/bots/
+OPENAI_MODEL=bot-20250404114220-z2xsd
+```
 
 ---
 
-## [1.x] - 历史版本
+## [1.0.0] - 历史版本
 
+原版项目功能：
 - 基础的周报生成功能
 - OpenAI GPT-3.5 API 集成
 - Vercel Edge Functions 支持
 - 国际化支持（中英文）
+- 简单的Markdown渲染
+
+**原版项目地址**: https://github.com/guaguaguaxia/weekly_report

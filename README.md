@@ -23,7 +23,6 @@
 | DeepSeek | `https://api.deepseek.com/v1` | `deepseek-chat`, `deepseek-coder` | DeepSeek AI |
 | Moonshot | `https://api.moonshot.cn/v1` | `moonshot-v1-8k`, `moonshot-v1-32k` | 月之暗面 |
 | 智谱AI | `https://open.bigmodel.cn/api/paas/v4` | `glm-4`, `glm-3-turbo` | 智谱 GLM |
-| 火山引擎 | `https://ark.cn-beijing.volces.com/api/v3/bots/` | `bot-*` | 字节跳动火山引擎 |
 | 自定义 | 自定义URL | 自定义模型 | 任何兼容 OpenAI 格式的API |
 
 ## 🚀 快速开始
@@ -213,12 +212,7 @@ OPENAI_API_BASE=https://open.bigmodel.cn/api/paas/v4
 OPENAI_MODEL=glm-4
 ```
 
-**火山引擎（字节跳动）：**
-```bash
-OPENAI_API_KEY=your-volcengine-key
-OPENAI_API_BASE=https://ark.cn-beijing.volces.com/api/v3/bots/
-OPENAI_MODEL=bot-20250404114220-z2xsd
-```
+
 
 <!-- https://www.seotraininglondon.org/gpt3-business-email-generator/ -->
 

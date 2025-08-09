@@ -35,13 +35,7 @@ export const API_PROVIDERS: Record<string, APIProvider> = {
     keyFormat: /^[A-Za-z0-9._-]{16,}$/,
     description: "Zhipu AI GLM API"
   },
-  volcengine: {
-    name: "Volcengine (ByteDance)",
-    baseURL: "https://ark.cn-beijing.volces.com/api/v3",
-    models: ["bot-*"],
-    keyFormat: /^[A-Za-z0-9._-]{16,}$/,
-    description: "Volcengine Ark API"
-  },
+
   custom: {
     name: "Custom",
     baseURL: "",
