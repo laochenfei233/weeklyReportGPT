@@ -3,7 +3,6 @@ import type { AppProps } from "next/app";
 import { IntlProvider } from 'next-intl'
 import "../styles/globals.css";
 import "../styles/markdown.css";
-import "../styles/prose.css";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (

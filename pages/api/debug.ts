@@ -27,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
-async function handleEnvCheck(req: NextApiRequest, res: NextApiResponse) {
+async function handleEnvCheck(_req: NextApiRequest, res: NextApiResponse) {
   const envVars = {
     OPENAI_API_KEY: process.env.OPENAI_API_KEY ? '已设置' : '未设置',
     OPENAI_API_BASE: process.env.OPENAI_API_BASE || '使用默认值',
@@ -37,7 +37,7 @@ async function handleEnvCheck(req: NextApiRequest, res: NextApiResponse) {
     MAX_TOKENS: process.env.MAX_TOKENS || '2000'
   };
 
-  const issues = [];
+  const issues: string[] = [];
   
   if (!process.env.OPENAI_API_KEY) {
     issues.push('OPENAI_API_KEY 未设置');
@@ -59,7 +59,7 @@ async function handleEnvCheck(req: NextApiRequest, res: NextApiResponse) {
   });
 }
 
-async function handleApiTest(req: NextApiRequest, res: NextApiResponse) {
+async function handleApiTest(_req: NextApiRequest, res: NextApiResponse) {
   const apiKey = process.env.OPENAI_API_KEY;
   const apiBase = process.env.OPENAI_API_BASE || 'https://api.openai.com/v1';
   const model = process.env.OPENAI_MODEL || 'gpt-3.5-turbo';
