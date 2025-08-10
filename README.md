@@ -105,67 +105,32 @@ npm run dev
 4. 点击 **Save** 保存
 5. 重新部署项目
 
-### 使用脚本部署
 
-```bash
-# 运行部署检查脚本
-chmod +x scripts/deploy.sh
-./scripts/deploy.sh
-```
-
-## 🐳 Docker 部署
-
-### 使用现有镜像
-
-```bash
-docker run -d -p 3000:3000 --name weekly_report \
-  -e OPENAI_API_KEY=your-api-key \
-  -e OPENAI_API_BASE=https://api.openai.com/v1 \
-  -e OPENAI_MODEL=gpt-3.5-turbo \
-  ihxrainbow/weekly_report-docker
-```
-
-### Docker Compose
-
-```yaml
-version: '3.8'
-services:
-  weekly_report:
-    container_name: weekly_report
-    ports:
-      - '3000:3000'
-    image: ihxrainbow/weekly_report-docker
-    environment:
-      - OPENAI_API_KEY=your-api-key
-      - OPENAI_API_BASE=https://api.openai.com/v1
-      - OPENAI_MODEL=gpt-3.5-turbo
-      - NEXT_PUBLIC_USE_USER_KEY=false
-      - REQUEST_TIMEOUT=30000
-      - MAX_TOKENS=2000
-    restart: unless-stopped
-```
 
 ## 🔍 故障排除
 
 如果遇到"服务繁忙，请稍后再试"错误：
 
-1. **使用调试页面**: 访问 `https://your-domain.vercel.app/debug` 进行可视化测试
-2. **检查健康状态**: 访问 `https://your-domain.vercel.app/api/health` (GET)
-3. **验证API密钥**: 访问 `https://your-domain.vercel.app/api/validate-key` (GET)
-4. **测试API连接**: 访问 `https://your-domain.vercel.app/api/test` (POST)
+1. **使用调试页面**: 访问 `https://your-domain.vercel.app/debug` 进行系统诊断
+2. **检查健康状态**: 访问 `https://your-domain.vercel.app/api/health` 查看服务状态
+3. **检查环境变量**: 确保在 Vercel Dashboard 中正确设置了 `OPENAI_API_KEY`
+4. **验证API密钥**: 确保API密钥有效且有足够余额
 5. **查看Vercel日志**: 在Vercel项目页面查看Functions日志
-6. **参考调试指南**: 查看 [DEBUG_GUIDE.md](DEBUG_GUIDE.md)
 
 ### 快速修复
 
-如果问题紧急，尝试以下配置：
+推荐的环境变量配置：
 ```bash
 OPENAI_API_KEY=sk-your-openai-key
 OPENAI_API_BASE=https://api.openai.com/v1
 OPENAI_MODEL=gpt-3.5-turbo
-REQUEST_TIMEOUT=60000
-MAX_TOKENS=1000
+NEXT_PUBLIC_USE_USER_KEY=false
 ```
+
+### 调试工具
+- **调试页面**: `/debug` - 完整的系统诊断
+- **健康检查**: `/api/health` - 服务状态监控
+- **环境检查**: 自动检测配置问题
 
 ## 🔧 配置说明
 
@@ -212,7 +177,42 @@ OPENAI_API_BASE=https://open.bigmodel.cn/api/paas/v4
 OPENAI_MODEL=glm-4
 ```
 
+## 📖 使用指南
 
+### 基本使用
+1. **访问网站**：打开部署后的网站地址
+2. **输入内容**：在文本框中简单描述你的工作内容
+3. **生成周报**：点击生成按钮，等待AI生成完整的周报
+4. **复制使用**：点击复制按钮，将生成的周报复制到需要的地方
+
+### 输入技巧
+- **具体描述**：提供具体的工作内容，而不是泛泛而谈
+- **关键信息**：包含项目名称、完成的功能、解决的问题等
+- **数据支撑**：如果有具体的数据或成果，可以一并提及
+
+### 示例输入
+```
+本周完成了用户管理系统的开发，包括用户注册、登录、权限管理等功能。
+修复了订单系统中的3个bug，提升了系统稳定性。
+参与了2次技术评审会议，协助制定了新项目的技术方案。
+完成了代码review工作，审查了约500行代码。
+```
+
+### 调试功能
+如果遇到问题，可以访问 `/debug` 页面进行系统诊断：
+- 检查环境变量配置
+- 测试API连接状态  
+- 验证周报生成功能
+
+### 健康检查
+访问 `/api/health` 可以查看服务状态和配置信息。
+
+## 🔒 隐私保护
+
+- 您的输入内容不会被永久存储
+- 仅在生成周报时临时处理数据
+- 支持使用自己的API密钥增强隐私控制
+- 详细信息请查看 [隐私政策](./privacy.md)
 
 <!-- https://www.seotraininglondon.org/gpt3-business-email-generator/ -->
 

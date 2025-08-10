@@ -1,90 +1,73 @@
 # 更新日志
 
-## [2.0.0] - 2025-01-09
+## [2.0.0] - 2024-12-XX
 
-### 🎉 重大更新
+### 🎯 项目简化重构
+- **简化项目结构**: 删除了复杂的Docker部署和多平台支持
+- **专注核心功能**: 保留周报生成的核心功能，删除非必要特性
+- **统一部署方案**: 仅支持Vercel部署，提供最佳用户体验
+- **界面优化**: 删除了不必要的UI元素，保持简洁设计
 
-基于原版项目 [guaguaguaxia/weekly_report](https://github.com/guaguaguaxia/weekly_report) 进行全面升级和优化。
+### ✨ 新增功能
+- **调试面板**: 新增 `/debug` 页面，提供系统状态检查
+- **健康检查**: 恢复 `/api/health` 端点，用于服务状态监控
+- **环境检查**: 集成环境变量和API连接测试
 
-### 🚀 核心功能升级
+### 🗑️ 删除功能
+- 删除了所有Docker相关配置和脚本
+- 删除了Railway、Render等多平台部署支持
+- 删除了复杂的部署文档和脚本
+- 删除了不必要的测试和调试文件
 
-- **多API源支持**: 支持 OpenAI、DeepSeek、Moonshot、智谱AI、火山引擎等多种API源
-- **实时Markdown渲染**: 类似Typora的所见即所得体验，内容生成过程中实时渲染
-- **Typora风格界面**: 优雅的编辑器界面设计，专业的文档排版效果
-- **Node.js 22兼容**: 升级所有依赖包，支持最新版本
+### 📚 文档更新
+- 简化了README.md，专注于Vercel部署
+- 恢复了隐私政策和使用指南
+- 整合了使用说明到主文档中
 
-### ✨ 用户体验改进
+## [1.5.0] - 2024-11-XX
 
-- **即时预览**: 无需手动切换，生成过程中即可看到最终排版效果
-- **优雅排版**: 
-  - 标题层级和下划线样式
-  - 列表、引用、代码块的精美样式
-  - 表格的响应式设计
-  - 平滑的动画过渡效果
-- **智能复制**: 支持纯文本和带格式两种复制方式
-- **加载反馈**: 清晰的生成状态指示和进度反馈
+### ✨ 新特性
+- 🔄 **多API源支持**: 支持 OpenAI、DeepSeek、Moonshot、智谱AI 等多种 API 源
+- 🌐 **环境变量配置**: 通过环境变量灵活配置 API 源和模型
+- 🚀 **Node.js 22 支持**: 升级到最新的依赖和 Node.js 版本
+- ☁️ **Vercel 优化**: 保持完美的 Vercel 部署兼容性
+- 🛡️ **错误处理**: 增强的错误处理和超时控制
+- 📝 **TypeScript**: 完整的 TypeScript 支持
 
-### 🔧 技术架构升级
+### 🔧 技术改进
+- 升级了所有依赖到最新版本
+- 优化了API调用逻辑
+- 改进了错误处理机制
+- 增强了类型安全
 
-- **环境变量配置**: 通过环境变量灵活配置API源和参数
-- **错误处理增强**: 完善的错误处理和超时控制机制
-- **调试工具**: 内置调试页面和健康检查API
-- **性能优化**: 
-  - 防抖技术避免过度渲染
-  - requestAnimationFrame优化渲染性能
-  - 智能缓存和状态管理
+## [1.0.0] - 2023-XX-XX
 
-### 📦 依赖和配置
+### 🎉 首次发布
+- **核心功能**: 基于GPT的周报生成功能
+- **多语言支持**: 支持中文和英文界面
+- **响应式设计**: 适配桌面和移动设备
+- **实时生成**: 流式输出，实时显示生成过程
+- **Markdown支持**: 支持Markdown格式输出
+- **Vercel部署**: 一键部署到Vercel平台
 
-- Next.js 15.x
-- React 18.3.x  
-- TypeScript 5.7.x
-- Tailwind CSS 3.4.x
-- Marked 14.x (Markdown解析)
-- 新增 @tailwindcss/typography 插件
+### 🔧 支持的API源
+- OpenAI GPT-3.5/GPT-4
+- 自定义API端点支持
 
-### 🌐 部署支持
-
-- **Vercel**: 完美兼容，一键部署
-- **Docker**: 支持容器化部署
-- **环境变量**: 灵活的配置管理
-- **多区域**: 支持不同API服务商的区域配置
-
-### 🔗 链接更新
-
-- **项目仓库**: https://github.com/laochenfei233/weeklyReportGPT
-- **原版项目**: https://github.com/guaguaguaxia/weekly_report
-- **贡献者**: guaguaguaxia & laochenfei233
-- **技术支持**: Claude Sonnet 4.0 & Kiro
-
-### 📋 配置示例
-
-```bash
-# OpenAI官方
-OPENAI_API_KEY=sk-your-openai-key
-OPENAI_API_BASE=https://api.openai.com/v1
-OPENAI_MODEL=gpt-3.5-turbo
-
-# DeepSeek
-OPENAI_API_KEY=sk-your-deepseek-key
-OPENAI_API_BASE=https://api.deepseek.com/v1
-OPENAI_MODEL=deepseek-chat
-
-# 火山引擎
-OPENAI_API_KEY=your-volcengine-key
-OPENAI_API_BASE=https://ark.cn-beijing.volces.com/api/v3/bots/
-OPENAI_MODEL=bot-20250404114220-z2xsd
-```
+### 📱 界面特性
+- 简洁的用户界面
+- 实时Markdown渲染
+- 复制功能
+- 响应式布局
 
 ---
 
-## [1.0.0] - 历史版本
+## 版本说明
 
-原版项目功能：
-- 基础的周报生成功能
-- OpenAI GPT-3.5 API 集成
-- Vercel Edge Functions 支持
-- 国际化支持（中英文）
-- 简单的Markdown渲染
+- **主版本号**: 重大功能变更或架构调整
+- **次版本号**: 新功能添加
+- **修订版本号**: Bug修复和小改进
 
-**原版项目地址**: https://github.com/guaguaguaxia/weekly_report
+## 贡献指南
+
+欢迎提交Issue和Pull Request来帮助改进项目！

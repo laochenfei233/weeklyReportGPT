@@ -192,13 +192,6 @@ const Home: NextPage = () => {
           }
 
           <div className="flex mt-10 items-center space-x-3">
-            <Image
-              src="/1-black.png"
-              width={30}
-              height={30}
-              alt="1 icon"
-              className="mb-5 xs:mb-0"
-            />
             <p className="text-left font-medium">
               {t('step1')}{" "}
             </p>
