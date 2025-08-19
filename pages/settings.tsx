@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '../hooks/useAuth'; // 新增导入
 import Head from 'next/head';
 import { toast, Toaster } from 'react-hot-toast';
 import { useRouter } from 'next/router';
@@ -22,13 +23,14 @@ const defaultSettings: UserSettings = {
   customModel: 'gpt-3.5-turbo',
   customApiBase: 'https://api.openai.com/v1',
   customApiKey: '',
-  useCustomConfig: false
+  useCustomConfig: true  // 默认展开自定义配置
 };
 
 export default function Settings() {
   const router = useRouter();
   const [settings, setSettings] = useState<UserSettings>(defaultSettings);
   const [isLoading, setIsLoading] = useState(false);
+  const { stats } = useAuth(); // 新增
 
   // 加载设置
   useEffect(() => {
@@ -326,6 +328,47 @@ export default function Settings() {
                 </button>
               </div>
             </div>
+ 
+             {/* 使用情况统计 */}
+             <section>
+               <h2 className="text-xl font-semibold text-gray-800 mb-4">使用情况</h2>
+               {stats ? (
+                 <div className="bg-gray-50 rounded-lg p-4">
+                   <div className="grid grid-cols-2 gap-4 mb-4">
+                     <div className="bg-white p-3 rounded-md border border-gray-200">
+                       <p className="text-sm text-gray-600">今日使用</p>
+                       <p className="text-lg font-bold">{stats.todayUsage}/{stats.dailyLimit}</p>
+                     </div>
+                     <div className="bg-white p-3 rounded-md border border-gray-200">
+                       <p className="text-sm text-gray-600">总使用量</p>
+                       <p className="text-lg font-bold">{stats.totalUsage}</p>
+                     </div>
+                   </div>
+                   
+                   {stats.weeklyUsage.length > 0 && (
+                     <div>
+                       <h3 className="font-medium mb-2">最近7天使用情况</h3>
+                       <div className="space-y-2">
+                         {stats.weeklyUsage.map((day, index) => (
+                           <div key={index} className="flex items-center">
+                             <div className="w-24 text-sm text-gray-600">{day.date}</div>
+                             <div className="flex-1 bg-gray-200 rounded-full h-2">
+                               <div
+                                 className="bg-blue-600 h-2 rounded-full"
+                                 style={{ width: `${Math.min(100, (day.daily_total / stats.dailyLimit) * 100)}%` }}
+                               ></div>
+                             </div>
+                             <div className="w-12 text-right text-sm">{day.daily_total}</div>
+                           </div>
+                         ))}
+                       </div>
+                     </div>
+                   )}
+                 </div>
+               ) : (
+                 <p className="text-gray-500">加载使用数据中...</p>
+               )}
+             </section>
           </div>
 
           {/* 预览区域 */}

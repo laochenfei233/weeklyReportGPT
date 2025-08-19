@@ -1,4 +1,6 @@
 import { OpenAIStream, OpenAIStreamPayload } from "../../utils/OpenAIStream";
+import { getUserFromRequest } from "../../lib/auth";
+import { checkDailyLimit, recordTokenUsage } from "../../lib/db";
 
 // Validate environment variables
 if (process.env.NEXT_PUBLIC_USE_USER_KEY !== "true") {
@@ -15,6 +17,12 @@ interface CustomConfig {
   apiKey?: string;
   apiBase?: string;
   model?: string;
+}
+
+interface OpenAIStreamResult {
+  stream: ReadableStream;
+  inputTokens: number;
+  outputTokens: number;
 }
 
 interface RequestBody {
@@ -45,6 +53,38 @@ const handler = async (req: Request): Promise<Response> => {
       return new Response("Prompt is required", { status: 400 });
     }
 
+    // 检查用户认证和Token限制
+    const authHeader = req.headers.get('authorization');
+    const cookieHeader = req.headers.get('cookie');
+    
+    // 创建临时request对象用于获取用户信息
+    const tempReq = {
+      headers: {
+        authorization: authHeader,
+      },
+      cookies: cookieHeader ? Object.fromEntries(
+        cookieHeader.split('; ').map(c => c.split('='))
+      ) : {}
+    } as any;
+
+    const user = getUserFromRequest(tempReq);
+    
+    // 如果用户已登录且不是管理员，且没有使用自定义配置，检查Token限制
+    if (user && !user.isAdmin && !customConfig?.apiKey) {
+      const limitCheck = await checkDailyLimit(user.id);
+      if (!limitCheck.allowed) {
+        return new Response(JSON.stringify({
+          error: `今日Token使用量已达上限 (${limitCheck.usage}/${limitCheck.limit})`,
+          code: 'DAILY_LIMIT_EXCEEDED',
+          usage: limitCheck.usage,
+          limit: limitCheck.limit
+        }), {
+          status: 429,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
+    }
+
     // System prompt for weekly report generation
     const systemPrompt = "你是一个专业的周报生成助手。请帮我把以下的工作内容填充为一篇完整的周报，请直接用markdown格式以分点叙述的形式输出，内容要专业、详细且条理清晰。";
     
@@ -65,7 +105,16 @@ const handler = async (req: Request): Promise<Response> => {
       customApiBase: customConfig?.apiBase,
     };
 
-    const stream = await OpenAIStream(payload);
+    const { stream, inputTokens, outputTokens } = await OpenAIStream(payload, user);
+    
+    // 记录token使用量
+    if (user && !user.isAdmin && !customConfig?.apiKey) {
+      try {
+        await recordTokenUsage(user.id, inputTokens, outputTokens);
+      } catch (err) {
+        console.error('Failed to record token usage:', err);
+      }
+    }
     
     return new Response(stream, {
       headers: {

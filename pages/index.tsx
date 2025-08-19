@@ -9,11 +9,14 @@ import { Toaster, toast } from "react-hot-toast";
 import DropDown, { FormType } from "../components/DropDown";
 import Footer from "../components/Footer";
 import Github from "../components/GitHub";
+import LoginModal from "../components/LoginModal";
+import UsageRulesModal from "../components/UsageRulesModal";
 
 import Header from "../components/Header";
 import LoadingDots from "../components/LoadingDots";
 import ResizablePanel from "../components/ResizablePanel";
 import { marked } from "marked";
+import { useAuthState } from "../hooks/useAuth";
 
 interface UserSettings {
   fontSize: 'small' | 'medium' | 'large';
@@ -27,6 +30,7 @@ interface UserSettings {
 
 const Home: NextPage = () => {
   const t = useTranslations('Index')
+  const { user, stats, isLoading: authLoading, refreshUser } = useAuthState();
 
   const [loading, setLoading] = useState(false);
   const [chat, setChat] = useState("");
@@ -35,6 +39,8 @@ const Home: NextPage = () => {
   const [generatedChat, setGeneratedChat] = useState<String>("");
   const [renderedHtml, setRenderedHtml] = useState<string>("");
   const [userSettings, setUserSettings] = useState<UserSettings | null>(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showRulesModal, setShowRulesModal] = useState(false);
 
   // 加载用户设置
   useEffect(() => {
@@ -47,6 +53,16 @@ const Home: NextPage = () => {
       }
     }
   }, []);
+
+  // 检查是否需要显示使用规则弹窗
+  useEffect(() => {
+    if (!authLoading) {
+      const rulesAccepted = localStorage.getItem('usage_rules_accepted');
+      if (!rulesAccepted) {
+        setShowRulesModal(true);
+      }
+    }
+  }, [authLoading]);
 
   // 实时渲染markdown内容，带防抖优化
   useEffect(() => {
@@ -107,6 +123,15 @@ const Home: NextPage = () => {
     e.preventDefault();
     setGeneratedChat("");
     setLoading(true);
+
+    // 检查是否需要登录
+    if (!user && !userSettings?.useCustomConfig) {
+      toast.error("请先登录或配置自定义API");
+      setShowLoginModal(true);
+      setLoading(false);
+      return;
+    }
+
     if (useUserKey && api_key == ""){
       toast.error(t("API_KEY_NULL_ERROR"))
       setLoading(false)
@@ -140,6 +165,7 @@ const Home: NextPage = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(requestBody),
+      credentials: 'include'
     })
 
     console.log("Edge function returned.");
@@ -147,8 +173,15 @@ const Home: NextPage = () => {
     if (!response.ok) {
       try {
         const errorData = await response.json();
-        const errorMessage = errorData.error || "服务繁忙，请稍后再试";
-        toast.error(errorMessage);
+        
+        if (errorData.code === 'DAILY_LIMIT_EXCEEDED') {
+          toast.error(`今日使用量已达上限 (${errorData.usage}/${errorData.limit} tokens)`);
+          // 刷新用户统计信息
+          refreshUser();
+        } else {
+          const errorMessage = errorData.error || "服务繁忙，请稍后再试";
+          toast.error(errorMessage);
+        }
         console.error("API Error:", errorData);
       } catch (e) {
         toast.error("服务繁忙，请稍后再试");
@@ -206,6 +239,60 @@ const Home: NextPage = () => {
           {t('description1')} <br></br><div className=" px-4 py-2 sm:mt-3 mt-8  w-full"></div>{t('description2')}
         </h1>
         <p className="text-slate-500 mt-5">{t('slogan')}</p>
+
+        {/* 用户状态显示 */}
+        {user && stats && (
+          <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200 max-w-xl">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-blue-800">
+                  欢迎回来，{user.email}
+                  {user.isAdmin && <span className="ml-2 px-2 py-1 bg-blue-600 text-white text-xs rounded">管理员</span>}
+                </p>
+                {!user.isAdmin && (
+                  <p className="text-xs text-blue-600 mt-1">
+                    今日已使用: {stats.todayUsage}/{stats.dailyLimit} tokens
+                  </p>
+                )}
+              </div>
+              {!user.isAdmin && (
+                <div className="text-right">
+                  <div className="w-16 h-2 bg-blue-200 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-blue-600 transition-all duration-300"
+                      style={{ width: `${Math.min((stats.todayUsage / stats.dailyLimit) * 100, 100)}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-blue-600 mt-1">
+                    {((1 - stats.todayUsage / stats.dailyLimit) * 100).toFixed(0)}% 剩余
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* 未登录提示 */}
+        {!authLoading && !user && (
+          <div className="mt-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200 max-w-xl">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-yellow-800">
+                  登录后每日可免费使用 10,000 tokens
+                </p>
+                <p className="text-xs text-yellow-600 mt-1">
+                  或在设置中配置自己的API密钥
+                </p>
+              </div>
+              <button
+                onClick={() => setShowLoginModal(true)}
+                className="px-3 py-1 bg-yellow-600 text-white text-sm rounded hover:bg-yellow-700"
+              >
+                登录
+              </button>
+            </div>
+          </div>
+        )}
 
 
         <div className="max-w-xl w-full">
@@ -356,6 +443,25 @@ const Home: NextPage = () => {
         </ResizablePanel>
       </main>
       <Footer />
+
+      {/* 登录弹窗 */}
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onSuccess={(user) => {
+          refreshUser();
+          toast.success(`欢迎，${user.email}！`);
+        }}
+      />
+
+      {/* 使用规则弹窗 */}
+      <UsageRulesModal
+        isOpen={showRulesModal}
+        onClose={() => setShowRulesModal(false)}
+        onAccept={() => {
+          toast.success('欢迎使用 Weekly Report GPT！');
+        }}
+      />
     </div>
   );
 };
