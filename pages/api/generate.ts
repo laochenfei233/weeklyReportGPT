@@ -11,12 +11,19 @@ export const config = {
   runtime: "edge",
 };
 
+interface CustomConfig {
+  apiKey?: string;
+  apiBase?: string;
+  model?: string;
+}
+
 interface RequestBody {
   prompt?: string;
   api_key?: string;
   model?: string;
   temperature?: number;
   max_tokens?: number;
+  customConfig?: CustomConfig;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -30,7 +37,8 @@ const handler = async (req: Request): Promise<Response> => {
       api_key, 
       model,
       temperature = 0.7,
-      max_tokens
+      max_tokens,
+      customConfig
     } = (await req.json()) as RequestBody;
 
     if (!prompt || prompt.trim().length === 0) {
@@ -41,7 +49,7 @@ const handler = async (req: Request): Promise<Response> => {
     const systemPrompt = "你是一个专业的周报生成助手。请帮我把以下的工作内容填充为一篇完整的周报，请直接用markdown格式以分点叙述的形式输出，内容要专业、详细且条理清晰。";
     
     const payload: OpenAIStreamPayload = {
-      model: model || process.env.OPENAI_MODEL || "gpt-3.5-turbo",
+      model: model || customConfig?.model || process.env.OPENAI_MODEL || "gpt-3.5-turbo",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: prompt }
@@ -53,7 +61,8 @@ const handler = async (req: Request): Promise<Response> => {
       max_tokens: max_tokens || parseInt(process.env.MAX_TOKENS || "2000"),
       stream: true,
       n: 1,
-      api_key,
+      api_key: customConfig?.apiKey || api_key,
+      customApiBase: customConfig?.apiBase,
     };
 
     const stream = await OpenAIStream(payload);

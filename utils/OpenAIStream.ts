@@ -24,6 +24,7 @@ export interface OpenAIStreamPayload {
   stream: boolean;
   n: number;
   api_key?: string;
+  customApiBase?: string;
 }
 
 interface APIConfig {
@@ -56,9 +57,9 @@ export async function OpenAIStream(payload: OpenAIStreamPayload) {
   const useUserKey = process.env.NEXT_PUBLIC_USE_USER_KEY === "true";
   const config = getAPIConfig();
   
-  // Use user-provided key if enabled, otherwise use environment key
-  const apiKey = useUserKey ? (payload.api_key || "") : config.apiKey;
-  const baseURL = config.baseURL;
+  // Use custom config if provided, otherwise use user key or environment config
+  const apiKey = payload.api_key || config.apiKey;
+  const baseURL = payload.customApiBase || config.baseURL;
   const model = payload.model || config.model;
 
   if (!apiKey) {

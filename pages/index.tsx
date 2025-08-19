@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useTranslations } from 'next-intl'
 import { Toaster, toast } from "react-hot-toast";
@@ -14,6 +15,16 @@ import LoadingDots from "../components/LoadingDots";
 import ResizablePanel from "../components/ResizablePanel";
 import { marked } from "marked";
 
+interface UserSettings {
+  fontSize: 'small' | 'medium' | 'large';
+  responseStyle: 'professional' | 'casual' | 'detailed' | 'concise';
+  language: 'zh' | 'en';
+  customModel: string;
+  customApiBase: string;
+  customApiKey: string;
+  useCustomConfig: boolean;
+}
+
 const Home: NextPage = () => {
   const t = useTranslations('Index')
 
@@ -23,6 +34,19 @@ const Home: NextPage = () => {
   const [api_key, setAPIKey] = useState("")
   const [generatedChat, setGeneratedChat] = useState<String>("");
   const [renderedHtml, setRenderedHtml] = useState<string>("");
+  const [userSettings, setUserSettings] = useState<UserSettings | null>(null);
+
+  // 加载用户设置
+  useEffect(() => {
+    const savedSettings = localStorage.getItem('userSettings');
+    if (savedSettings) {
+      try {
+        setUserSettings(JSON.parse(savedSettings));
+      } catch (error) {
+        console.error('Failed to parse user settings:', error);
+      }
+    }
+  }, []);
 
   // 实时渲染markdown内容，带防抖优化
   useEffect(() => {
@@ -61,11 +85,22 @@ const Home: NextPage = () => {
 
   console.log("Streamed response: ", generatedChat);
 
-  const prompt =
-    form === 'paragraphForm'?
-      `${chat}`
-      : `${chat}`;
+  // 根据用户设置构建提示词
+  const getStyledPrompt = (content: string) => {
+    if (!userSettings) return content;
+    
+    const stylePrompts = {
+      professional: "请用专业正式的商务语言",
+      casual: "请用轻松友好的语调",
+      detailed: "请提供详细完整的描述和分析",
+      concise: "请简洁扼要地突出重点"
+    };
+    
+    const styleInstruction = stylePrompts[userSettings.responseStyle];
+    return `${styleInstruction}，${content}`;
+  };
 
+  const prompt = getStyledPrompt(chat);
   const useUserKey = process.env.NEXT_PUBLIC_USE_USER_KEY === "true" ? true : false;
 
   const generateChat = async (e: any) => {
@@ -82,27 +117,30 @@ const Home: NextPage = () => {
       setLoading(false)
       return
     }
-    const response = useUserKey ?
-      await fetch("/api/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          prompt,
-          api_key,
-        }),
-      })
-    :
-      await fetch("/api/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          prompt,
-        }),
-      })
+    // 构建请求体
+    const requestBody: any = { prompt };
+    
+    // 如果启用了用户密钥模式，添加API密钥
+    if (useUserKey) {
+      requestBody.api_key = api_key;
+    }
+    
+    // 如果用户配置了自定义设置，添加自定义配置
+    if (userSettings?.useCustomConfig) {
+      requestBody.customConfig = {
+        apiKey: userSettings.customApiKey,
+        apiBase: userSettings.customApiBase,
+        model: userSettings.customModel
+      };
+    }
+
+    const response = await fetch("/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestBody),
+    })
 
     console.log("Edge function returned.");
 
@@ -278,7 +316,10 @@ const Home: NextPage = () => {
                       </div>
                       
                       {/* Typora风格的内容区域 */}
-                      <div className="p-8 bg-white min-h-[400px] relative">
+                      <div className={`p-8 bg-white min-h-[400px] relative ${
+                        userSettings?.fontSize === 'small' ? 'text-sm' :
+                        userSettings?.fontSize === 'large' ? 'text-lg' : 'text-base'
+                      }`}>
                         {loading && !generatedChat && (
                           <div className="flex items-center justify-center h-full">
                             <div className="text-gray-500 flex items-center space-x-2">
