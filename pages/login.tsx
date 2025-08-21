@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head'; // 添加Head组件导入
-import { useAuth } from '../hooks/useAuth';
+import { useAuthState } from '../hooks/useAuth';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
@@ -10,7 +10,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login } = useAuthState();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {

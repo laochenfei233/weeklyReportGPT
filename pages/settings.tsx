@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../hooks/useAuth'; // 新增导入
+import { useAuthState } from '../hooks/useAuth'; // 新增导入
 import Head from 'next/head';
 import { toast, Toaster } from 'react-hot-toast';
 import { useRouter } from 'next/router';
@@ -30,7 +30,7 @@ export default function Settings() {
   const router = useRouter();
   const [settings, setSettings] = useState<UserSettings>(defaultSettings);
   const [isLoading, setIsLoading] = useState(false);
-  const { stats } = useAuth(); // 新增
+  const { stats } = useAuthState(); // 新增
 
   // 加载设置
   useEffect(() => {

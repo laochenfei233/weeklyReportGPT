@@ -3,9 +3,10 @@ import React from 'react';
 interface UsageRulesModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onAccept?: () => void;
 }
 
-const UsageRulesModal: React.FC<UsageRulesModalProps> = ({ isOpen, onClose }) => {
+const UsageRulesModal: React.FC<UsageRulesModalProps> = ({ isOpen, onClose, onAccept }) => {
   if (!isOpen) return null;
 
   return (
@@ -21,7 +22,12 @@ const UsageRulesModal: React.FC<UsageRulesModalProps> = ({ isOpen, onClose }) =>
         
         <div className="mt-6 flex justify-end">
           <button
-            onClick={onClose}
+            onClick={() => {
+              if (onAccept) {
+                onAccept();
+              }
+              onClose();
+            }}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
           >
             同意并继续

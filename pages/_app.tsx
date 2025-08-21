@@ -3,8 +3,8 @@ import type { AppProps } from "next/app";
 import { IntlProvider } from 'next-intl'
 import "../styles/globals.css";
 import "../styles/markdown.css";
-import { useEffect, useState } from 'react'; // 新增导入
-import UsageRulesModal from '../components/UsageRulesModal'; // 新增导入
+import { useEffect, useState } from 'react';
+import UsageRulesModal from '../components/UsageRulesModal';
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [showRulesModal, setShowRulesModal] = useState(false);

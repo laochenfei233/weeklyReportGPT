@@ -105,16 +105,7 @@ const handler = async (req: Request): Promise<Response> => {
       customApiBase: customConfig?.apiBase,
     };
 
-    const { stream, inputTokens, outputTokens } = await OpenAIStream(payload, user);
-    
-    // 记录token使用量
-    if (user && !user.isAdmin && !customConfig?.apiKey) {
-      try {
-        await recordTokenUsage(user.id, inputTokens, outputTokens);
-      } catch (err) {
-        console.error('Failed to record token usage:', err);
-      }
-    }
+    const stream = await OpenAIStream(payload, user);
     
     return new Response(stream, {
       headers: {
