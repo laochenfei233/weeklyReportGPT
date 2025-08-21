@@ -1,4 +1,5 @@
 import { sql } from '@vercel/postgres';
+import { hashPassword } from './auth';
 
 export interface User {
   id: string;
@@ -55,6 +56,31 @@ export async function initDatabase() {
     await sql`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_token_usage_user_date ON token_usage(user_id, date)`;
 
+    // 创建默认管理员账户
+    try {
+      const adminEmail = 'admin';
+      const adminPassword = 'admin';
+      
+      // 检查是否已存在管理员账户
+      const existingAdmin = await sql`
+        SELECT * FROM users WHERE email = ${adminEmail} LIMIT 1
+      `;
+      
+      if (existingAdmin.rows.length === 0) {
+        // 创建管理员账户
+        const passwordHash = await hashPassword(adminPassword);
+        await sql`
+          INSERT INTO users (email, username, password_hash, is_admin)
+          VALUES (${adminEmail}, ${adminEmail}, ${passwordHash}, true)
+        `;
+        console.log('Default admin user created successfully');
+      } else {
+        console.log('Admin user already exists');
+      }
+    } catch (adminError) {
+      console.error('Admin user creation error:', adminError);
+    }
+    
     console.log('Database initialized successfully');
   } catch (error) {
     console.error('Database initialization error:', error);
@@ -75,12 +101,25 @@ export async function getUserByEmail(email: string): Promise<User | null> {
   }
 }
 
-// 创建用户
-export async function createUser(email: string, passwordHash: string): Promise<User | null> {
+// 通过用户名获取用户
+export async function getUserByUsername(username: string): Promise<User | null> {
   try {
     const result = await sql`
-      INSERT INTO users (email, password_hash)
-      VALUES (${email}, ${passwordHash})
+      SELECT * FROM users WHERE username = ${username} LIMIT 1
+    `;
+    return result.rows[0] as User || null;
+  } catch (error) {
+    console.error('Get user by username error:', error);
+    return null;
+  }
+}
+
+// 创建用户
+export async function createUser(email: string, username: string, passwordHash: string): Promise<User | null> {
+  try {
+    const result = await sql`
+      INSERT INTO users (email, username, password_hash)
+      VALUES (${email}, ${username}, ${passwordHash})
       RETURNING *
     `;
     return result.rows[0] as User;
