@@ -25,16 +25,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // 验证密码
-    const isValidPassword = await verifyPassword(password, user.password_hash);
+    const isValidPassword = await verifyPassword(password, user!.password_hash);
     if (!isValidPassword) {
       return res.status(401).json({ error: '账户或密码错误' });
     }
 
     // 生成token
     const token = generateToken({
-      id: user.id,
-      email: user.email,
-      isAdmin: user.is_admin
+      id: user!.id,
+      email: user!.email,
+      isAdmin: user!.is_admin
     });
 
     // 设置cookie
