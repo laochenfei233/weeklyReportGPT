@@ -23,6 +23,8 @@ const UsageRulesModal: React.FC<UsageRulesModalProps> = ({ isOpen, onClose, onAc
         <div className="mt-6 flex justify-end">
           <button
             onClick={() => {
+              // 记录用户已接受使用规则
+              localStorage.setItem('usage_rules_accepted', 'true');
               if (onAccept) {
                 onAccept();
               }

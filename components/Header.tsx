@@ -51,16 +51,6 @@ export default function Header() {
           <span>设置</span>
         </Link>
 
-        {/* 调试按钮 */}
-        <Link 
-          href="/debug"
-          className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span>调试</span>
-        </Link>
 
         {/* 用户菜单 */}
         {user && (
