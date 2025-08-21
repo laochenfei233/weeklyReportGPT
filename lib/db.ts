@@ -58,7 +58,7 @@ export async function initDatabase() {
 
     // 创建默认管理员账户
     try {
-      const adminEmail = 'admin';
+      const adminEmail = 'admin@123.com';
       const adminPassword = 'admin';
       
       // 检查是否已存在管理员账户
