@@ -10,7 +10,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "add-username-field": "node scripts/add-username-field.js"
   },
   "dependencies": {
     "@headlessui/react": "^2.1.10",
