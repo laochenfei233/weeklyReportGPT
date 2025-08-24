@@ -11,33 +11,101 @@ interface LoginModalProps {
 export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalProps) {
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [isVerificationSent, setIsVerificationSent] = useState(false);
+  const [verificationLoading, setVerificationLoading] = useState(false);
   const [formData, setFormData] = useState({
-    email: '',
+    identifier: '', // 用于登录时的邮箱或用户名
+    email: '',      // 用于注册时的邮箱
+    username: '',   // 用于注册时的用户名
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    verificationCode: ''
   });
+
+  const handleSendVerification = async () => {
+    if (!formData.email) {
+      toast.error('请输入邮箱地址');
+      return;
+    }
+
+    setVerificationLoading(true);
+    try {
+      const response = await fetch('/api/auth/send-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success('验证码已发送到您的邮箱');
+        setIsVerificationSent(true);
+      } else {
+        toast.error(data.error || '发送验证码失败');
+      }
+    } catch (error) {
+      toast.error('网络错误，请稍后重试');
+    } finally {
+      setVerificationLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
+      if (isLogin) {
+        // 登录
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            identifier: formData.identifier,
+            password: formData.password
+          })
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (response.ok) {
-        toast.success(isLogin ? '登录成功' : '注册成功');
-        onSuccess(data.user);
-        onClose();
-        setFormData({ email: '', password: '', confirmPassword: '' });
+        if (response.ok) {
+          toast.success('登录成功');
+          onSuccess(data.user);
+          onClose();
+          resetForm();
+        } else {
+          toast.error(data.error || '登录失败');
+        }
       } else {
-        toast.error(data.error || '操作失败');
+        // 注册
+        if (!isVerificationSent) {
+          toast.error('请先获取邮箱验证码');
+          return;
+        }
+
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: formData.email,
+            username: formData.username,
+            password: formData.password,
+            confirmPassword: formData.confirmPassword,
+            verificationCode: formData.verificationCode
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          toast.success('注册成功，欢迎使用！');
+          onSuccess(data.user);
+          onClose();
+          resetForm();
+        } else {
+          toast.error(data.error || '注册失败');
+        }
       }
     } catch (error) {
       toast.error('网络错误，请稍后重试');
@@ -46,9 +114,21 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
     }
   };
 
+  const resetForm = () => {
+    setFormData({
+      identifier: '',
+      email: '',
+      username: '',
+      password: '',
+      confirmPassword: '',
+      verificationCode: ''
+    });
+    setIsVerificationSent(false);
+  };
+
   const switchMode = () => {
     setIsLogin(!isLogin);
-    setFormData({ email: '', password: '', confirmPassword: '' });
+    resetForm();
   };
 
   return (
@@ -86,48 +166,126 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
                 </Dialog.Title>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      邮箱地址
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="请输入邮箱地址"
-                    />
-                  </div>
+                  {isLogin ? (
+                    // 登录表单
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          邮箱地址或用户名
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={formData.identifier}
+                          onChange={(e) => setFormData(prev => ({ ...prev, identifier: e.target.value }))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="请输入邮箱地址或用户名"
+                        />
+                      </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      密码
-                    </label>
-                    <input
-                      type="password"
-                      required
-                      value={formData.password}
-                      onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="请输入密码"
-                    />
-                  </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          密码
+                        </label>
+                        <input
+                          type="password"
+                          required
+                          value={formData.password}
+                          onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="请输入密码"
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    // 注册表单
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          邮箱地址
+                        </label>
+                        <div className="flex space-x-2">
+                          <input
+                            type="email"
+                            required
+                            value={formData.email}
+                            onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="请输入邮箱地址"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleSendVerification}
+                            disabled={verificationLoading || !formData.email}
+                            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                          >
+                            {verificationLoading ? '发送中...' : '获取验证码'}
+                          </button>
+                        </div>
+                      </div>
 
-                  {!isLogin && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        确认密码
-                      </label>
-                      <input
-                        type="password"
-                        required
-                        value={formData.confirmPassword}
-                        onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="请再次输入密码"
-                      />
-                    </div>
+                      {isVerificationSent && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            邮箱验证码
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={formData.verificationCode}
+                            onChange={(e) => setFormData(prev => ({ ...prev, verificationCode: e.target.value }))}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="请输入6位验证码"
+                            maxLength={6}
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            验证码已发送到您的邮箱，有效期10分钟
+                          </p>
+                        </div>
+                      )}
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          用户名
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={formData.username}
+                          onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="请输入用户名"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          密码
+                        </label>
+                        <input
+                          type="password"
+                          required
+                          value={formData.password}
+                          onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="请输入密码"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          确认密码
+                        </label>
+                        <input
+                          type="password"
+                          required
+                          value={formData.confirmPassword}
+                          onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="请再次输入密码"
+                        />
+                      </div>
+                    </>
                   )}
 
                   <div className="flex justify-between items-center pt-4">
@@ -163,7 +321,18 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
                     <p className="text-xs text-blue-800">
                       • 密码至少6个字符<br/>
                       • 需要包含字母和数字<br/>
+                      • 需要邮箱验证<br/>
                       • 注册后每日可免费使用1万token
+                    </p>
+                  </div>
+                )}
+
+                {isLogin && (
+                  <div className="mt-4 p-3 bg-green-50 rounded-md">
+                    <p className="text-xs text-green-800">
+                      💡 <strong>测试账号：</strong><br/>
+                      邮箱：admin@example.com<br/>
+                      密码：admin123
                     </p>
                   </div>
                 )}

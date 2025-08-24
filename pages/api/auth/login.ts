@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getUserByEmail } from '../../../lib/db';
-import { verifyPassword, generateToken, isValidEmail } from '../../../lib/auth';
+import { getUserByEmailOrUsername } from '../../../lib/db';
+import { verifyPassword, generateToken } from '../../../lib/auth';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -8,33 +8,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { email, password } = req.body;
+    const { identifier, password } = req.body; // identifier 可以是邮箱或用户名
 
     // 验证输入
-    if (!email || !password) {
-      return res.status(400).json({ error: '邮箱和密码不能为空' });
+    if (!identifier || !password) {
+      return res.status(400).json({ error: '用户名/邮箱和密码不能为空' });
     }
 
-    if (!isValidEmail(email)) {
-      return res.status(400).json({ error: '邮箱格式不正确' });
-    }
-
-    // 查找用户
-    const user = await getUserByEmail(email.toLowerCase());
+    // 查找用户（支持邮箱或用户名）
+    const user = await getUserByEmailOrUsername(identifier);
     if (!user) {
+      return res.status(401).json({ error: '用户名/邮箱或密码错误' });
     }
 
     // 验证密码
-    const isValidPassword = await verifyPassword(password, user!.password_hash);
+    const isValidPassword = await verifyPassword(password, user.password_hash);
     if (!isValidPassword) {
-      return res.status(401).json({ error: '账户或密码错误' });
+      return res.status(401).json({ error: '用户名/邮箱或密码错误' });
     }
 
     // 生成token
     const token = generateToken({
-      id: user!.id,
-      email: user!.email,
-      isAdmin: user!.is_admin
+      id: user.id,
+      email: user.email,
+      isAdmin: user.is_admin
     });
 
     // 设置cookie
@@ -47,9 +44,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({
       success: true,
       user: {
-        id: user!.id,
-        email: user!.email,
-        isAdmin: user!.is_admin
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        isAdmin: user.is_admin,
+        emailVerified: user.email_verified
       },
       token
     });
