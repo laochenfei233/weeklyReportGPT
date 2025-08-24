@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getUserByEmailOrUsername } from '../../../lib/db';
-import { verifyPassword, generateToken } from '../../../lib/auth';
+import { getUserByEmail, getUserByUsername } from '../../../lib/db';
+import { verifyPassword, generateToken, isValidEmail } from '../../../lib/auth';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -16,7 +16,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // 查找用户（支持邮箱或用户名）
-    const user = await getUserByEmailOrUsername(identifier);
+    let user;
+    if (isValidEmail(identifier)) {
+      // 如果是邮箱格式，按邮箱查找
+      user = await getUserByEmail(identifier.toLowerCase());
+    } else {
+      // 否则按用户名查找
+      user = await getUserByUsername(identifier);
+    }
+
     if (!user) {
       return res.status(401).json({ error: '用户名/邮箱或密码错误' });
     }
