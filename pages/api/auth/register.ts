@@ -1,9 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getUserByEmail, getUserByUsername, createUser } from '../../../lib/db';
 import { hashPassword, generateToken, isValidEmail, isValidPassword } from '../../../lib/auth';
-import { sendWelcomeEmail } from '../../../lib/email';
-
-// 导入邮箱验证相关函数
 import { sql } from '@vercel/postgres';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -74,8 +71,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       WHERE email = ${email.toLowerCase()}
     `;
 
-    // 发送欢迎邮件
-    await sendWelcomeEmail(email.toLowerCase(), username);
+    // 发送欢迎邮件 (暂时禁用以解决编译问题)
+    // await sendWelcomeEmail(email.toLowerCase(), username);
+    console.log('用户注册成功:', { email: email.toLowerCase(), username });
 
     // 生成token
     const token = generateToken({
