@@ -1,7 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getUserByEmail, getUserByUsername, createUser, verifyEmailCode, markEmailAsVerified } from '../../../lib/db';
+import { getUserByEmail, getUserByUsername, createUser } from '../../../lib/db';
 import { hashPassword, generateToken, isValidEmail, isValidPassword } from '../../../lib/auth';
 import { sendWelcomeEmail } from '../../../lib/email';
+
+// 导入邮箱验证相关函数
+import { sql } from '@vercel/postgres';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -30,10 +33,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // 验证邮箱验证码
-    const isValidCode = await verifyEmailCode(email.toLowerCase(), verificationCode);
-    if (!isValidCode) {
+    const verificationResult = await sql`
+      SELECT * FROM email_verifications 
+      WHERE email = ${email.toLowerCase()} AND code = ${verificationCode} AND expires_at > NOW()
+      LIMIT 1
+    `;
+    
+    if (verificationResult.rows.length === 0) {
       return res.status(400).json({ error: '验证码无效或已过期' });
     }
+    
+    // 删除已使用的验证码
+    await sql`DELETE FROM email_verifications WHERE email = ${email.toLowerCase()}`;
 
     // 检查邮箱是否已存在
     const existingEmailUser = await getUserByEmail(email.toLowerCase());
@@ -58,7 +69,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // 标记邮箱为已验证
-    await markEmailAsVerified(email.toLowerCase());
+    await sql`
+      UPDATE users SET email_verified = true, updated_at = NOW()
+      WHERE email = ${email.toLowerCase()}
+    `;
 
     // 发送欢迎邮件
     await sendWelcomeEmail(email.toLowerCase(), username);

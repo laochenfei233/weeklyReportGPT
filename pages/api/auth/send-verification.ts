@@ -1,7 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { isValidEmail } from '../../../lib/auth';
-import { getUserByEmail, generateVerificationCode, saveEmailVerification } from '../../../lib/db';
+import { getUserByEmail } from '../../../lib/db';
 import { sendVerificationEmail } from '../../../lib/email';
+import { sql } from '@vercel/postgres';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -27,11 +28,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // 生成验证码
-    const code = generateVerificationCode();
+    const code = Math.random().toString().slice(2, 8).padStart(6, '0');
 
     // 保存验证码到数据库
-    const saved = await saveEmailVerification(email.toLowerCase(), code);
-    if (!saved) {
+    try {
+      // 删除旧的验证码
+      await sql`DELETE FROM email_verifications WHERE email = ${email.toLowerCase()}`;
+      
+      // 设置过期时间（10分钟后）
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+      
+      await sql`
+        INSERT INTO email_verifications (email, code, expires_at)
+        VALUES (${email.toLowerCase()}, ${code}, ${expiresAt})
+      `;
+    } catch (error) {
+      console.error('Save verification code error:', error);
       return res.status(500).json({ error: '验证码保存失败，请稍后重试' });
     }
 
