@@ -51,7 +51,6 @@ export default function Header() {
           <span>设置</span>
         </Link>
 
-
         {/* 用户菜单 */}
         {user && (
           <div className="relative">
@@ -78,18 +77,11 @@ export default function Header() {
                     )}
                   </div>
                   <Link
-                    href="/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    onClick={() => setShowUserMenu(false)}
-                  >
-                    个人中心
-                  </Link>
-                  <Link
                     href="/settings"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     onClick={() => setShowUserMenu(false)}
                   >
-                    个人设置
+                    API设置
                   </Link>
                   <Link
                     href="/debug"

@@ -162,7 +162,7 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
                   as="h3"
                   className="text-lg font-medium leading-6 text-gray-900 mb-4"
                 >
-                  {isLogin ? '登录账号' : '注册账号'}
+                  {isLogin ? '管理员登录' : '管理员注册'}
                 </Dialog.Title>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -294,7 +294,7 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
                       onClick={switchMode}
                       className="text-sm text-blue-600 hover:text-blue-800"
                     >
-                      {isLogin ? '没有账号？立即注册' : '已有账号？立即登录'}
+                      {isLogin ? '没有管理员账号？立即注册' : '已有管理员账号？立即登录'}
                     </button>
 
                     <div className="space-x-3">
@@ -322,7 +322,7 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
                       • 密码至少6个字符<br/>
                       • 需要包含字母和数字<br/>
                       • 需要邮箱验证<br/>
-                      • 注册后每日可免费使用1万token
+                      • 管理员账户无token使用限制
                     </p>
                   </div>
                 )}

@@ -210,9 +210,13 @@ const Home: NextPage = () => {
                   欢迎回来，{user.email}
                   {user.isAdmin && <span className="ml-2 px-2 py-1 bg-blue-600 text-white text-xs rounded">管理员</span>}
                 </p>
-                {!user.isAdmin && (
-                  <p className="text-xs text-blue-600 mt-1">
-                    今日已使用: {stats.todayUsage}/{stats.dailyLimit} tokens
+                {user.isAdmin ? (
+                  <p className="text-xs text-green-600 mt-1">
+                    ✅ 管理员账户，无token使用限制
+                  </p>
+                ) : (
+                  <p className="text-xs text-orange-600 mt-1">
+                    ⚠️ 今日已使用: {stats.todayUsage}/{stats.dailyLimit} tokens
                   </p>
                 )}
               </div>
@@ -235,21 +239,21 @@ const Home: NextPage = () => {
 
         {/* 未登录提示 */}
         {!authLoading && !user && (
-          <div className="mt-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200 max-w-xl">
+          <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200 max-w-xl">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-yellow-800">
-                  登录后每日可免费使用 10,000 tokens
+                <p className="text-sm text-blue-800">
+                  管理员登录后可无限制使用
                 </p>
-                <p className="text-xs text-yellow-600 mt-1">
+                <p className="text-xs text-blue-600 mt-1">
                   或在设置中配置自己的API密钥
                 </p>
               </div>
               <button
                 onClick={() => setShowLoginModal(true)}
-                className="px-3 py-1 bg-yellow-600 text-white text-sm rounded hover:bg-yellow-700"
+                className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
               >
-                登录
+                管理
               </button>
             </div>
           </div>
