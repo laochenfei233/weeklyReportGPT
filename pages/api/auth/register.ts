@@ -94,7 +94,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       user: {
         id: user.id,
         email: user.email,
-        username: user.username || username,
+        username: username, // 直接使用注册时提供的username
         isAdmin: user.is_admin
       },
       token
