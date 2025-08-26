@@ -64,6 +64,11 @@ OPENAI_MODEL=gpt-3.5-turbo
 NEXT_PUBLIC_USE_USER_KEY=false
 REQUEST_TIMEOUT=30000
 MAX_TOKENS=2000
+
+# 认证配置（如果使用用户系统）
+JWT_SECRET=your-jwt-secret-key-change-in-production
+DB_INIT_KEY=your-database-init-key
+SESSION_DURATION_DAYS=14
 ```
 
 4. **启动开发服务器**
@@ -146,6 +151,9 @@ NEXT_PUBLIC_USE_USER_KEY=false
 | `NEXT_PUBLIC_USE_USER_KEY` | 否 | `false` | 是否允许用户输入自己的API密钥 |
 | `REQUEST_TIMEOUT` | 否 | `30000` | 请求超时时间（毫秒） |
 | `MAX_TOKENS` | 否 | `2000` | 最大生成token数 |
+| `SESSION_DURATION_DAYS` | 否 | `14` | 用户会话持续时间（天） |
+| `JWT_SECRET` | 否 | - | JWT密钥，生产环境必须设置 |
+| `DB_INIT_KEY` | 否 | - | 数据库初始化密钥 |
 
 *当 `NEXT_PUBLIC_USE_USER_KEY=true` 时不必需
 
@@ -178,6 +186,30 @@ OPENAI_API_KEY=your-zhipu-key
 OPENAI_API_BASE=https://open.bigmodel.cn/api/paas/v4
 OPENAI_MODEL=glm-4
 ```
+
+### 认证系统配置
+
+如果你的部署包含用户认证系统，需要额外配置以下环境变量：
+
+```bash
+# 认证配置
+JWT_SECRET=your-jwt-secret-key-change-in-production  # JWT密钥，生产环境必须更改
+DB_INIT_KEY=your-database-init-key                   # 数据库初始化密钥
+SESSION_DURATION_DAYS=14                             # 用户会话持续时间（天）
+
+# 邮件配置（可选）
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-app-password
+SMTP_FROM=noreply@yourapp.com
+```
+
+**会话配置说明：**
+- `SESSION_DURATION_DAYS`: 控制用户登录后的会话持续时间
+- 默认值为14天，可以根据需要调整（如7天、30天等）
+- 修改后需要重启应用才能生效
+- 同时影响JWT token过期时间和cookie的Max-Age设置
 
 ## 📖 使用指南
 

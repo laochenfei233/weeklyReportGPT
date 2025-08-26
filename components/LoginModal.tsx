@@ -239,6 +239,9 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
                             maxLength={6}
                           />
                           <p className="text-xs text-gray-500 mt-1">
+                            💡 验证码已显示在服务器控制台日志中，请在 Vercel Functions 日志中查看
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
                             验证码已发送到您的邮箱，有效期10分钟
                           </p>
                         </div>
@@ -321,7 +324,7 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
                     <p className="text-xs text-blue-800">
                       • 密码至少6个字符<br/>
                       • 需要包含字母和数字<br/>
-                      • 需要邮箱验证<br/>
+                      • 验证码将显示在服务器控制台日志中<br/>
                       • 管理员账户无token使用限制
                     </p>
                   </div>

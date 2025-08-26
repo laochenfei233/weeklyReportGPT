@@ -42,9 +42,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       isAdmin: user.is_admin
     });
 
-    // 设置cookie
+    // 设置cookie - 使用环境变量配置的会话持续时间，默认14天
+    const sessionDurationDays = parseInt(process.env.SESSION_DURATION_DAYS || '14');
+    const maxAge = sessionDurationDays * 24 * 60 * 60; // 转换为秒
+    
     res.setHeader('Set-Cookie', [
-      `auth_token=${token}; HttpOnly; Path=/; Max-Age=${7 * 24 * 60 * 60}; SameSite=Strict${
+      `auth_token=${token}; HttpOnly; Path=/; Max-Age=${maxAge}; SameSite=Strict${
         process.env.NODE_ENV === 'production' ? '; Secure' : ''
       }`
     ]);

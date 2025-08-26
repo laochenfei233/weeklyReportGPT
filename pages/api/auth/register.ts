@@ -35,11 +35,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       WHERE email = ${email.toLowerCase()} AND code = ${verificationCode} AND expires_at > NOW()
       LIMIT 1
     `;
-    
+
     if (verificationResult.rows.length === 0) {
       return res.status(400).json({ error: '验证码无效或已过期' });
     }
-    
+
     // 删除已使用的验证码
     await sql`DELETE FROM email_verifications WHERE email = ${email.toLowerCase()}`;
 
@@ -48,7 +48,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (existingEmailUser) {
       return res.status(409).json({ error: '该邮箱已被注册' });
     }
-    
+
     // 检查用户名是否已存在
     const existingUsernameUser = await getUserByUsername(username);
     if (existingUsernameUser) {
@@ -57,7 +57,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // 创建用户
     const passwordHash = await hashPassword(password);
-    
+
     // 创建用户（包含用户名）
     const user = await createUser(email.toLowerCase(), username, passwordHash);
 
@@ -82,10 +82,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       isAdmin: user.is_admin
     });
 
-    // 设置cookie
+    // 设置cookie - 使用环境变量配置的会话持续时间，默认14天
+    const sessionDurationDays = parseInt(process.env.SESSION_DURATION_DAYS || '14');
+    const maxAge = sessionDurationDays * 24 * 60 * 60; // 转换为秒
+
     res.setHeader('Set-Cookie', [
-      `auth_token=${token}; HttpOnly; Path=/; Max-Age=${7 * 24 * 60 * 60}; SameSite=Strict${
-        process.env.NODE_ENV === 'production' ? '; Secure' : ''
+      `auth_token=${token}; HttpOnly; Path=/; Max-Age=${maxAge}; SameSite=Strict${process.env.NODE_ENV === 'production' ? '; Secure' : ''
       }`
     ]);
 

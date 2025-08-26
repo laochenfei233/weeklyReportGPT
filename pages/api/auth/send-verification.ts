@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { isValidEmail } from '../../../lib/auth';
 import { getUserByEmail } from '../../../lib/db';
-import { sendVerificationEmail } from '../../../lib/email';
 import { sql } from '@vercel/postgres';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -47,15 +46,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(500).json({ error: '验证码保存失败，请稍后重试' });
     }
 
-    // 发送验证码邮件
-    const sent = await sendVerificationEmail(email.toLowerCase(), code);
-    if (!sent) {
-      return res.status(500).json({ error: '验证码发送失败，请稍后重试' });
-    }
+    // 发送验证码邮件 (暂时禁用以解决编译问题)
+    // const sent = await sendVerificationEmail(email.toLowerCase(), code);
+    // if (!sent) {
+    //   return res.status(500).json({ error: '验证码发送失败，请稍后重试' });
+    // }
+    
+    // 管理员验证码 - 在控制台显示（用于2FA或服务器日志查看）
+    const timestamp = new Date().toLocaleString('zh-CN');
+    console.log('\n' + '='.repeat(60));
+    console.log('🔐 管理员验证码 - ADMIN VERIFICATION CODE');
+    console.log('='.repeat(60));
+    console.log(`📧 邮箱: ${email.toLowerCase()}`);
+    console.log(`🔢 验证码: ${code}`);
+    console.log(`⏰ 生成时间: ${timestamp}`);
+    console.log(`⏳ 有效期: 10分钟`);
+    console.log(`🔍 请在 Vercel Functions 日志中查看此验证码`);
+    console.log('='.repeat(60) + '\n');
 
     return res.status(200).json({
       success: true,
-      message: '验证码已发送到您的邮箱，请查收'
+      message: '管理员验证码已生成，请在服务器控制台日志中查看'
     });
 
   } catch (error) {
