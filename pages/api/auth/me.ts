@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getUserFromRequest } from '../../../lib/auth';
-import { getUserStats } from '../../../lib/db';
+import { verifyToken } from '../../../lib/auth';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -8,26 +7,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const user = getUserFromRequest(req);
+    const token = req.cookies.auth_token;
     
-    if (!user) {
-      return res.status(401).json({ error: '未登录' });
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
     }
 
-    // 获取用户统计信息
-    const stats = await getUserStats(user.id);
+    const user = verifyToken(token);
+    
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
 
     return res.status(200).json({
       user: {
         id: user.id,
         email: user.email,
+        username: user.id === 'admin' ? 'admin' : user.email.split('@')[0],
         isAdmin: user.isAdmin
-      },
-      stats
+      }
     });
 
   } catch (error) {
-    console.error('Get user info error:', error);
-    return res.status(500).json({ error: '获取用户信息失败' });
+    console.error('Auth me error:', error);
+    return res.status(500).json({ error: 'Internal server error' });
   }
 }

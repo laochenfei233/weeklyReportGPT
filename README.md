@@ -42,10 +42,24 @@ cd weeklyReportGPT
 npm install
 ```
 
-3. **配置环境变量**
+3. **快速设置（推荐）**
+```bash
+npm run setup
+```
+
+或者手动配置：
+
+4. **配置环境变量**
 ```bash
 cp .env.example .env
 ```
+
+5. **生成 JWT 密钥（如果使用管理员功能）**
+```bash
+npm run generate-jwt-secret
+```
+
+6. **编辑环境变量**
 
 编辑 `.env` 文件，配置你的 API 源：
 
@@ -65,18 +79,23 @@ NEXT_PUBLIC_USE_USER_KEY=false
 REQUEST_TIMEOUT=30000
 MAX_TOKENS=2000
 
-# 认证配置（如果使用用户系统）
-JWT_SECRET=your-jwt-secret-key-change-in-production
-DB_INIT_KEY=your-database-init-key
+# 认证配置（如果使用管理员系统）
+JWT_SECRET=生成的密钥粘贴到这里
 SESSION_DURATION_DAYS=14
 ```
 
-4. **启动开发服务器**
+7. **启动开发服务器**
 ```bash
 npm run dev
 ```
 
 打开 `http://localhost:3000`
+
+### 🔒 环境变量安全提醒
+
+- `.env` 文件已在 `.gitignore` 中，不会被提交到 Git
+- 请勿将包含真实 API 密钥的环境变量文件分享给他人
+- 生产环境部署时，在平台的环境变量设置中配置，而不是代码中
 
 
 ## ☁️ 部署到 Vercel
@@ -94,12 +113,14 @@ npm run dev
 **必需的环境变量：**
 - `OPENAI_API_KEY` = `your-api-key-here`
 - `NEXT_PUBLIC_USE_USER_KEY` = `false`
+- `JWT_SECRET` = `生成的64字节随机字符串`
 
 **可选的环境变量：**
 - `OPENAI_API_BASE` = `https://api.openai.com/v1`
 - `OPENAI_MODEL` = `gpt-3.5-turbo`
 - `REQUEST_TIMEOUT` = `30000`
 - `MAX_TOKENS` = `2000`
+- `SESSION_DURATION_DAYS` = `14`
 
 ### 配置步骤
 
@@ -153,7 +174,6 @@ NEXT_PUBLIC_USE_USER_KEY=false
 | `MAX_TOKENS` | 否 | `2000` | 最大生成token数 |
 | `SESSION_DURATION_DAYS` | 否 | `14` | 用户会话持续时间（天） |
 | `JWT_SECRET` | 否 | - | JWT密钥，生产环境必须设置 |
-| `DB_INIT_KEY` | 否 | - | 数据库初始化密钥 |
 
 *当 `NEXT_PUBLIC_USE_USER_KEY=true` 时不必需
 
@@ -187,29 +207,60 @@ OPENAI_API_BASE=https://open.bigmodel.cn/api/paas/v4
 OPENAI_MODEL=glm-4
 ```
 
-### 认证系统配置
+### 管理员认证配置
 
-如果你的部署包含用户认证系统，需要额外配置以下环境变量：
+如果你的部署包含管理员认证系统，需要额外配置以下环境变量：
 
 ```bash
 # 认证配置
-JWT_SECRET=your-jwt-secret-key-change-in-production  # JWT密钥，生产环境必须更改
-DB_INIT_KEY=your-database-init-key                   # 数据库初始化密钥
-SESSION_DURATION_DAYS=14                             # 用户会话持续时间（天）
-
-# 邮件配置（可选）
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASS=your-app-password
-SMTP_FROM=noreply@yourapp.com
+JWT_SECRET=your-jwt-secret-key-change-in-production  # JWT密钥，生产环境必须设置
+SESSION_DURATION_DAYS=14                             # 管理员会话持续时间（天）
 ```
 
-**会话配置说明：**
-- `SESSION_DURATION_DAYS`: 控制用户登录后的会话持续时间
+**如何生成安全的 JWT_SECRET：**
+
+方法1 - 使用项目脚本（推荐）：
+```bash
+npm run generate-jwt-secret
+```
+
+方法2 - 直接使用脚本：
+```bash
+node scripts/generate-jwt-secret.js
+```
+
+方法3 - 使用 Node.js：
+```bash
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+```
+
+方法4 - 使用 OpenSSL：
+```bash
+openssl rand -hex 64
+```
+
+方法5 - 在线生成器：
+访问 https://generate-secret.vercel.app/64 生成64字节的随机密钥
+
+**配置步骤：**
+1. 运行 `npm run generate-jwt-secret` 生成密钥
+2. 复制生成的密钥
+3. 在 `.env` 文件中替换 `JWT_SECRET=your-jwt-secret-key-change-in-production`
+4. 在 Vercel 环境变量中添加相同的密钥
+
+**管理员认证说明：**
+- 使用验证码登录，无需数据库
+- 验证码显示在服务器日志中（Vercel Functions 日志）
+- `JWT_SECRET`: JWT token 签名密钥，**生产环境必须设置为安全的随机字符串**
+- `SESSION_DURATION_DAYS`: 控制管理员登录后的会话持续时间
 - 默认值为14天，可以根据需要调整（如7天、30天等）
 - 修改后需要重启应用才能生效
-- 同时影响JWT token过期时间和cookie的Max-Age设置
+
+**验证码登录流程：**
+1. 点击"管理"按钮
+2. 点击"生成验证码"
+3. 在 Vercel Dashboard → Functions → 日志中查看6位验证码
+4. 输入验证码完成登录
 
 ## 📖 使用指南
 

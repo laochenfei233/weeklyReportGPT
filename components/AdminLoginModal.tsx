@@ -1,17 +1,19 @@
 import { useState } from 'react';
-import { toast } from 'react-hot-toast';
+import { useAuth } from '../hooks/useAuth';
 
-interface LoginModalProps {
+interface AdminLoginModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (user: any) => void;
 }
 
-export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalProps) {
+export default function AdminLoginModal({ isOpen, onClose }: AdminLoginModalProps) {
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [message, setMessage] = useState('');
+  const { login } = useAuth();
+
+  if (!isOpen) return null;
 
   const handleGenerateCode = async () => {
     setGenerating(true);
@@ -58,8 +60,8 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
       const data = await response.json();
       
       if (data.success) {
-        toast.success('登录成功！');
-        onSuccess(data.user);
+        login(data.user, data.token);
+        setMessage('✅ 登录成功！');
         setTimeout(() => {
           onClose();
           setCode('');
@@ -74,8 +76,6 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
       setLoading(false);
     }
   };
-
-  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

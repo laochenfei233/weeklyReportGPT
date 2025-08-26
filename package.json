@@ -11,6 +11,8 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
+    "setup": "node scripts/setup.js",
+    "generate-jwt-secret": "node scripts/generate-jwt-secret.js",
     "add-username-field": "node scripts/add-username-field.js"
   },
   "dependencies": {

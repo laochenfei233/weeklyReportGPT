@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import Github from "./GitHub";
-import { useAuthState } from "../hooks/useAuth";
+import { useAuthState } from "../hooks/useSimpleAuth";
 
 export default function Header() {
   const t = useTranslations('Index')

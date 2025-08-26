@@ -1,6 +1,5 @@
 import { OpenAIStream, OpenAIStreamPayload } from "../../utils/OpenAIStream";
 import { getUserFromRequest } from "../../lib/auth";
-import { checkDailyLimit, recordTokenUsage } from "../../lib/db";
 
 // Validate environment variables
 if (process.env.NEXT_PUBLIC_USE_USER_KEY !== "true") {
@@ -53,7 +52,7 @@ const handler = async (req: Request): Promise<Response> => {
       return new Response("Prompt is required", { status: 400 });
     }
 
-    // 检查用户认证和Token限制
+    // 检查用户认证（简化版本，不检查Token限制）
     const authHeader = req.headers.get('authorization');
     const cookieHeader = req.headers.get('cookie');
     
@@ -69,20 +68,15 @@ const handler = async (req: Request): Promise<Response> => {
 
     const user = getUserFromRequest(tempReq);
     
-    // 如果用户已登录且不是管理员，且没有使用自定义配置，检查Token限制
-    if (user && !user.isAdmin && !customConfig?.apiKey) {
-      const limitCheck = await checkDailyLimit(user.id);
-      if (!limitCheck.allowed) {
-        return new Response(JSON.stringify({
-          error: `今日Token使用量已达上限 (${limitCheck.usage}/${limitCheck.limit})`,
-          code: 'DAILY_LIMIT_EXCEEDED',
-          usage: limitCheck.usage,
-          limit: limitCheck.limit
-        }), {
-          status: 429,
-          headers: { "Content-Type": "application/json" }
-        });
-      }
+    // 如果没有用户登录且没有自定义配置，需要API密钥
+    if (!user && !customConfig?.apiKey && process.env.NEXT_PUBLIC_USE_USER_KEY === "true") {
+      return new Response(JSON.stringify({
+        error: "请先登录或配置API密钥",
+        code: 'AUTH_REQUIRED'
+      }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" }
+      });
     }
 
     // System prompt for weekly report generation
