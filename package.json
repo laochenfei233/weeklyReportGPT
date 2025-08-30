@@ -7,7 +7,8 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "npm run auto-setup-jwt && next build",
+    "build": "next build",
+    "build-with-jwt": "npm run auto-setup-jwt && next build",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
