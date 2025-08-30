@@ -11,7 +11,7 @@ import UsageRulesModal from "../components/UsageRulesModal";
 import Header from "../components/Header";
 import LoadingDots from "../components/LoadingDots";
 import ResizablePanel from "../components/ResizablePanel";
-import { useAuthState } from "../hooks/useSimpleAuth";
+import { useAuthState } from "../hooks/useAuth";
 import MarkdownRenderer from "../components/MarkdownRenderer";
 
 interface UserSettings {

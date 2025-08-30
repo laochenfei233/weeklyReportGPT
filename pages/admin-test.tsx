@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAuthState } from '../hooks/useSimpleAuth';
+import { useAuthState } from '../hooks/useAuth';
 import LoginModal from '../components/LoginModal';
 
 export default function AdminTest() {
