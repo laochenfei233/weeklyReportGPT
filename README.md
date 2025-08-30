@@ -29,6 +29,12 @@
 
 ## 🚀 快速开始
 
+### 系统要求
+
+- **Node.js**: 18.0.0 - 22.x （推荐使用最新的 LTS 版本）
+- **npm**: 6.0.0 或更高版本
+- **操作系统**: Windows, macOS, Linux
+
 ### 本地运行
 
 1. **克隆项目**
@@ -239,14 +245,29 @@ node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 openssl rand -hex 64
 ```
 
-方法5 - 在线生成器：
+方法5 - Vercel网页生成（推荐）：
+访问你的部署地址 `https://your-app.vercel.app/generate-jwt` 使用网页生成器
+
+方法6 - Vercel API生成：
+访问你的部署地址 `https://your-app.vercel.app/api/generate-jwt-secret` 生成密钥
+
+方法7 - 在线生成器：
 访问 https://generate-secret.vercel.app/64 生成64字节的随机密钥
 
 **配置步骤：**
+
+**本地开发：**
 1. 运行 `npm run generate-jwt-secret` 生成密钥
 2. 复制生成的密钥
 3. 在 `.env` 文件中替换 `JWT_SECRET=your-jwt-secret-key-change-in-production`
-4. 在 Vercel 环境变量中添加相同的密钥
+
+**Vercel部署：**
+1. 访问 `https://your-app.vercel.app/generate-jwt` 使用网页生成器
+2. 点击"生成新密钥"按钮
+3. 复制生成的密钥
+4. 在 Vercel Dashboard → Settings → Environment Variables 中添加
+5. 变量名：`JWT_SECRET`，值：复制的密钥
+6. 重新部署项目
 
 **管理员认证说明：**
 - 使用验证码登录，无需数据库

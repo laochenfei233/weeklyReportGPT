@@ -54,8 +54,8 @@ export default function AdminTest() {
       <div className="mt-8 bg-gray-50 border border-gray-200 rounded-lg p-4">
         <h3 className="font-semibold mb-2">📋 使用说明：</h3>
         <ol className="text-sm text-gray-700 space-y-1">
-          <li>1. 点击"管理员登录"按钮</li>
-          <li>2. 在弹窗中点击"生成验证码"</li>
+          <li>1. 点击&quot;管理员登录&quot;按钮</li>
+          <li>2. 在弹窗中点击&quot;生成验证码&quot;</li>
           <li>3. 查看服务器日志获取6位验证码</li>
           <li>4. 输入验证码完成登录</li>
         </ol>

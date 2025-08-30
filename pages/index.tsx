@@ -26,7 +26,7 @@ interface UserSettings {
 
 const Home: NextPage = () => {
   const t = useTranslations('Index')
-  const { user, stats, isLoading: authLoading, refreshUser } = useAuthState();
+  const { user, isLoading: authLoading, refreshUser } = useAuthState();
 
   const [loading, setLoading] = useState(false);
   const [chat, setChat] = useState("");
@@ -202,7 +202,7 @@ const Home: NextPage = () => {
         <p className="text-slate-500 mt-5">{t('slogan')}</p>
 
         {/* 用户状态显示 */}
-        {user && stats && (
+        {user && (
           <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200 max-w-xl">
             <div className="flex items-center justify-between">
               <div>
@@ -210,29 +210,10 @@ const Home: NextPage = () => {
                   欢迎回来，{user.email}
                   {user.isAdmin && <span className="ml-2 px-2 py-1 bg-blue-600 text-white text-xs rounded">管理员</span>}
                 </p>
-                {user.isAdmin ? (
-                  <p className="text-xs text-green-600 mt-1">
-                    ✅ 管理员账户，无token使用限制
-                  </p>
-                ) : (
-                  <p className="text-xs text-orange-600 mt-1">
-                    ⚠️ 今日已使用: {stats.todayUsage}/{stats.dailyLimit} tokens
-                  </p>
-                )}
+                <p className="text-xs text-green-600 mt-1">
+                  ✅ 管理员账户，无token使用限制
+                </p>
               </div>
-              {!user.isAdmin && (
-                <div className="text-right">
-                  <div className="w-16 h-2 bg-blue-200 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-blue-600 transition-all duration-300"
-                      style={{ width: `${Math.min((stats.todayUsage / stats.dailyLimit) * 100, 100)}%` }}
-                    />
-                  </div>
-                  <p className="text-xs text-blue-600 mt-1">
-                    {((1 - stats.todayUsage / stats.dailyLimit) * 100).toFixed(0)}% 剩余
-                  </p>
-                </div>
-              )}
             </div>
           </div>
         )}
