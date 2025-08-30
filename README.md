@@ -125,6 +125,8 @@ npm run dev
 - 🎲 **手动生成**：访问 `https://your-app.vercel.app/generate-jwt` 手动生成
 - ⚙️ **自定义设置**：手动设置 `JWT_SECRET` 环境变量
 
+📋 **详细部署指南**: 查看 [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)
+
 **可选的环境变量：**
 - `OPENAI_API_BASE` = `https://api.openai.com/v1`
 - `OPENAI_MODEL` = `gpt-3.5-turbo`
