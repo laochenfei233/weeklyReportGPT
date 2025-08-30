@@ -45,14 +45,26 @@
 .markdown-content ol {
   padding-left: 1.5rem;
   margin-bottom: 1rem;
+  list-style-position: outside;
 }
 
 .markdown-content li {
   margin-bottom: 0.25rem;
+  padding-left: 0.25rem;
 }
 
 .markdown-content li > p {
   margin-bottom: 0.5rem;
+  display: inline;
+}
+
+/* 确保列表项内容不换行到序号下方 */
+.markdown-content ul li {
+  list-style-type: disc;
+}
+
+.markdown-content ol li {
+  list-style-type: decimal;
 }
 
 /* 代码样式 */

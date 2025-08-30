@@ -28,8 +28,8 @@ const postProcessHtml = (html: string): string => {
     .replace(/<a href/g, '<a class="text-blue-600 hover:text-blue-800 underline transition-colors" target="_blank" rel="noopener noreferrer" href')
     
     // 为列表添加样式
-    .replace(/<ul>/g, '<ul class="list-disc list-inside space-y-1 my-4 ml-4 text-gray-700 text-left">')
-    .replace(/<ol>/g, '<ol class="list-decimal list-inside space-y-1 my-4 ml-4 text-gray-700 text-left">')
+    .replace(/<ul>/g, '<ul class="list-disc list-outside space-y-1 my-4 pl-6 text-gray-700 text-left">')
+    .replace(/<ol>/g, '<ol class="list-decimal list-outside space-y-1 my-4 pl-6 text-gray-700 text-left">')
     
     // 为代码添加样式
     .replace(/<code>/g, '<code class="bg-gray-100 text-red-600 px-1 py-0.5 rounded text-sm font-mono">')
