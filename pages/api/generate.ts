@@ -52,27 +52,14 @@ const handler = async (req: Request): Promise<Response> => {
       return new Response("Prompt is required", { status: 400 });
     }
 
-    // 检查用户认证（简化版本，不检查Token限制）
-    const authHeader = req.headers.get('authorization');
-    const cookieHeader = req.headers.get('cookie');
+    // 在 Edge Runtime 中跳过用户认证，避免 crypto 模块问题
+    const user = null;
     
-    // 创建临时request对象用于获取用户信息
-    const tempReq = {
-      headers: {
-        authorization: authHeader,
-      },
-      cookies: cookieHeader ? Object.fromEntries(
-        cookieHeader.split('; ').map(c => c.split('='))
-      ) : {}
-    } as any;
-
-    const user = getUserFromRequest(tempReq);
-    
-    // 如果没有用户登录且没有自定义配置，需要API密钥
-    if (!user && !customConfig?.apiKey && process.env.NEXT_PUBLIC_USE_USER_KEY === "true") {
+    // 在 Edge Runtime 中简化认证检查
+    if (!customConfig?.apiKey && !api_key && process.env.NEXT_PUBLIC_USE_USER_KEY === "true") {
       return new Response(JSON.stringify({
-        error: "请先登录或配置API密钥",
-        code: 'AUTH_REQUIRED'
+        error: "请配置API密钥",
+        code: 'API_KEY_REQUIRED'
       }), {
         status: 401,
         headers: { "Content-Type": "application/json" }

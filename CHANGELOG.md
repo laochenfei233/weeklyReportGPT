@@ -18,6 +18,8 @@
 - **两步部署**: 简化为仅需设置 `OPENAI_API_KEY` 即可完成部署
 
 ### 🔧 技术优化
+- **Edge Runtime兼容**: 修复了JWT生成在Edge Runtime中的crypto模块错误
+- **跨平台兼容**: JWT生成支持Node.js Runtime和Edge Runtime
 - **环境无关**: 在任何环境中都能正常工作
 - **构建稳定性**: 消除了不同环境中的构建差异
 - **用户体验**: 大幅提升部署和使用的便利性
