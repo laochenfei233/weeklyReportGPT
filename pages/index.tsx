@@ -165,12 +165,37 @@ const Home: NextPage = () => {
     const reader = data.getReader();
     const decoder = new TextDecoder();
     let done = false;
+    let lastChunkTime = Date.now();
+    const timeoutDuration = 15000; // 15秒无数据则认为超时
 
-    while (!done) {
-      const { value, done: doneReading } = await reader.read();
-      done = doneReading;
-      const chunkValue = decoder.decode(value).replace("<|im_end|>", "");
-      setGeneratedChat((prev) => prev + chunkValue);
+    try {
+      while (!done) {
+        // 设置读取超时
+        const readPromise = reader.read();
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('Stream timeout')), timeoutDuration);
+        });
+
+        const result = await Promise.race([readPromise, timeoutPromise]) as ReadableStreamReadResult<Uint8Array>;
+        
+        const { value, done: doneReading } = result;
+        done = doneReading;
+        
+        if (value) {
+          lastChunkTime = Date.now();
+          const chunkValue = decoder.decode(value).replace("<|im_end|>", "");
+          setGeneratedChat((prev) => prev + chunkValue);
+        }
+      }
+    } catch (error) {
+      console.error("Stream error:", error);
+      if (error instanceof Error && error.message === 'Stream timeout') {
+        toast.error("生成超时，但已保存当前内容");
+      } else {
+        toast.error("流式传输中断，已保存当前内容");
+      }
+    } finally {
+      reader.releaseLock();
     }
 
     setLoading(false);

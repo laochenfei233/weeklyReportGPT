@@ -1,3 +1,11 @@
 {
-  "buildCommand": "npm run build"
+  "functions": {
+    "pages/api/generate.js": {
+      "maxDuration": 60
+    }
+  },
+  "regions": ["hkg1", "sin1", "nrt1"],
+  "env": {
+    "REQUEST_TIMEOUT": "45000"
+  }
 }

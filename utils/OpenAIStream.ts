@@ -98,7 +98,14 @@ export async function OpenAIStream(payload: OpenAIStreamPayload, user?: any | nu
   const headers = adapter.transformHeaders(apiKey);
   const transformedPayload = adapter.transformPayload(cleanPayload);
 
-  const timeout = parseInt(process.env.REQUEST_TIMEOUT || "30000");
+  // 根据API提供商设置不同的超时时间
+  let timeout = parseInt(process.env.REQUEST_TIMEOUT || "30000");
+  if (baseURL.includes('deepseek.com')) {
+    timeout = 45000; // DeepSeek需要更长时间
+  } else if (baseURL.includes('moonshot.cn')) {
+    timeout = 40000; // Moonshot也可能较慢
+  }
+  
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
 
@@ -143,6 +150,7 @@ export async function OpenAIStream(payload: OpenAIStreamPayload, user?: any | nu
             const data = event.data;
             
             if (data === "[DONE]") {
+              console.log('Stream completed normally');
               controller.close();
               return;
             }
@@ -163,9 +171,12 @@ export async function OpenAIStream(payload: OpenAIStreamPayload, user?: any | nu
                 counter++;
               }
             } catch (e) {
-              console.error("Parse error:", e);
-              controller.error(e);
+              console.error("Parse error:", e, "Data:", data);
+              // 不要因为单个解析错误就终止整个流
+              // controller.error(e);
             }
+          } else if (event.type === "reconnect-interval") {
+            console.log("Reconnect interval:", event.value);
           }
         }
 

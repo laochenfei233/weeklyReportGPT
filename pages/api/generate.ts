@@ -1,6 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { OpenAIStream, OpenAIStreamPayload } from "../../utils/OpenAIStream";
 
+// Vercel函数配置 - 延长超时时间
+export const config = {
+  maxDuration: 60, // 60秒超时（Pro计划支持）
+};
+
 // Validate environment variables
 if (process.env.NEXT_PUBLIC_USE_USER_KEY !== "true") {
   if (!process.env.OPENAI_API_KEY) {
