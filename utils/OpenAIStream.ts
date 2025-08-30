@@ -5,8 +5,6 @@ import {
 } from "eventsource-parser";
 import { validateAPIKey, getDefaultModel } from "./apiConfig";
 import { getAPIAdapter } from "./apiAdapters";
-import { recordTokenUsage } from "../lib/db";
-import { AuthUser } from "../lib/auth";
 
 export type ChatGPTAgent = "user" | "system" | "assistant";
 
@@ -59,7 +57,7 @@ function estimateTokens(text: string): number {
   return Math.ceil(chineseChars / 1.5 + otherChars / 4);
 }
 
-export async function OpenAIStream(payload: OpenAIStreamPayload, user?: AuthUser | null) {
+export async function OpenAIStream(payload: OpenAIStreamPayload, user?: any | null) {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
   let counter = 0;
@@ -185,15 +183,10 @@ export async function OpenAIStream(payload: OpenAIStreamPayload, user?: AuthUser
           console.error("Stream error:", error);
           controller.error(error);
         } finally {
-          // 记录Token使用量（仅对非管理员用户且未使用自定义配置）
+          // Token使用量记录在Edge Runtime中跳过，避免数据库依赖
           if (user && !user.isAdmin && !payload.customApiBase) {
             const outputTokens = estimateTokens(outputText);
-            try {
-              await recordTokenUsage(user.id, inputTokens, outputTokens);
-              console.log(`Token usage recorded: ${inputTokens} input + ${outputTokens} output = ${inputTokens + outputTokens} total`);
-            } catch (error) {
-              console.error('Failed to record token usage:', error);
-            }
+            console.log(`Token usage (not recorded in Edge Runtime): ${inputTokens} input + ${outputTokens} output = ${inputTokens + outputTokens} total`);
           }
         }
       },

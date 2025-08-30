@@ -1,5 +1,5 @@
+import { NextApiRequest, NextApiResponse } from 'next';
 import { OpenAIStream, OpenAIStreamPayload } from "../../utils/OpenAIStream";
-import { getUserFromRequest } from "../../lib/auth";
 
 // Validate environment variables
 if (process.env.NEXT_PUBLIC_USE_USER_KEY !== "true") {
@@ -8,20 +8,10 @@ if (process.env.NEXT_PUBLIC_USE_USER_KEY !== "true") {
   }
 }
 
-export const config = {
-  runtime: "edge",
-};
-
 interface CustomConfig {
   apiKey?: string;
   apiBase?: string;
   model?: string;
-}
-
-interface OpenAIStreamResult {
-  stream: ReadableStream;
-  inputTokens: number;
-  outputTokens: number;
 }
 
 interface RequestBody {
@@ -33,10 +23,10 @@ interface RequestBody {
   customConfig?: CustomConfig;
 }
 
-export default async function handler(req: Request): Promise<Response> {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method !== "POST") {
-      return new Response("Method not allowed", { status: 405 });
+      return res.status(405).json({ error: "Method not allowed" });
     }
 
     const { 
@@ -46,13 +36,13 @@ export default async function handler(req: Request): Promise<Response> {
       temperature = 0.7,
       max_tokens,
       customConfig
-    } = (await req.json()) as RequestBody;
+    } = req.body as RequestBody;
 
     if (!prompt || prompt.trim().length === 0) {
-      return new Response("Prompt is required", { status: 400 });
+      return res.status(400).json({ error: "Prompt is required" });
     }
 
-    // 在 Edge Runtime 中跳过用户认证，避免 crypto 模块问题
+    // Skip user authentication for now to avoid crypto issues
     const user = null;
     
     // 检查API密钥配置
@@ -62,13 +52,10 @@ export default async function handler(req: Request): Promise<Response> {
     
     // 如果启用了用户密钥模式但没有提供密钥，且系统也没有密钥，则报错
     if (useUserKey && !hasUserKey && !hasSystemKey) {
-      return new Response(JSON.stringify({
+      return res.status(401).json({
         error: "请配置API密钥",
         code: 'API_KEY_REQUIRED',
         details: "系统未配置默认API密钥，请在设置中配置您的API密钥"
-      }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" }
       });
     }
     
@@ -99,13 +86,28 @@ export default async function handler(req: Request): Promise<Response> {
 
     const stream = await OpenAIStream(payload, user);
     
-    return new Response(stream, {
-      headers: {
-        "Content-Type": "text/plain; charset=utf-8",
-        "Cache-Control": "no-cache",
-        "Connection": "keep-alive",
-      },
-    });
+    // Set headers for streaming response
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    
+    // Stream the response
+    const reader = stream.getReader();
+    const decoder = new TextDecoder();
+    
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        const chunk = decoder.decode(value);
+        res.write(chunk);
+      }
+    } finally {
+      reader.releaseLock();
+      res.end();
+    }
+    
   } catch (error) {
     console.error("API Error:", error);
     
@@ -128,15 +130,10 @@ export default async function handler(req: Request): Promise<Response> {
       }
     }
     
-    return new Response(JSON.stringify({ 
+    res.status(statusCode).json({ 
       error: errorMessage,
       details: error instanceof Error ? error.message : "Unknown error",
       timestamp: new Date().toISOString()
-    }), {
-      status: statusCode,
-      headers: { "Content-Type": "application/json" },
     });
   }
-};
-
-// Handler is now exported as default function above
+}
