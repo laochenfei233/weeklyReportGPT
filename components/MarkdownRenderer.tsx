@@ -39,7 +39,8 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
     <div className={`relative ${className}`}>
       {renderedHtml && (
         <div
-          className="markdown-content prose prose-gray max-w-none"
+          className="markdown-content prose prose-gray max-w-none text-left"
+          style={{ textAlign: 'left' }}
           dangerouslySetInnerHTML={{
             __html: renderedHtml,
           }}

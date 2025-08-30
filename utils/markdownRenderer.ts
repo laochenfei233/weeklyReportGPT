@@ -14,22 +14,22 @@ export const configureMarked = () => {
 const postProcessHtml = (html: string): string => {
   return html
     // 为标题添加样式
-    .replace(/<h1>/g, '<h1 class="text-3xl font-bold mt-8 mb-4 text-gray-900 border-b-2 border-gray-200 pb-2">')
-    .replace(/<h2>/g, '<h2 class="text-2xl font-bold mt-6 mb-3 text-gray-900 border-b border-gray-200 pb-1">')
-    .replace(/<h3>/g, '<h3 class="text-xl font-semibold mt-4 mb-2 text-gray-900">')
-    .replace(/<h4>/g, '<h4 class="text-lg font-semibold mt-3 mb-2 text-gray-900">')
-    .replace(/<h5>/g, '<h5 class="text-base font-semibold mt-2 mb-1 text-gray-900">')
-    .replace(/<h6>/g, '<h6 class="text-sm font-semibold mt-2 mb-1 text-gray-900">')
+    .replace(/<h1>/g, '<h1 class="text-3xl font-bold mt-8 mb-4 text-gray-900 border-b-2 border-gray-200 pb-2 text-left">')
+    .replace(/<h2>/g, '<h2 class="text-2xl font-bold mt-6 mb-3 text-gray-900 border-b border-gray-200 pb-1 text-left">')
+    .replace(/<h3>/g, '<h3 class="text-xl font-semibold mt-4 mb-2 text-gray-900 text-left">')
+    .replace(/<h4>/g, '<h4 class="text-lg font-semibold mt-3 mb-2 text-gray-900 text-left">')
+    .replace(/<h5>/g, '<h5 class="text-base font-semibold mt-2 mb-1 text-gray-900 text-left">')
+    .replace(/<h6>/g, '<h6 class="text-sm font-semibold mt-2 mb-1 text-gray-900 text-left">')
     
     // 为段落添加样式
-    .replace(/<p>/g, '<p class="mb-4 leading-relaxed text-gray-700">')
+    .replace(/<p>/g, '<p class="mb-4 leading-relaxed text-gray-700 text-left">')
     
     // 为链接添加样式
     .replace(/<a href/g, '<a class="text-blue-600 hover:text-blue-800 underline transition-colors" target="_blank" rel="noopener noreferrer" href')
     
     // 为列表添加样式
-    .replace(/<ul>/g, '<ul class="list-disc list-inside space-y-1 my-4 ml-4 text-gray-700">')
-    .replace(/<ol>/g, '<ol class="list-decimal list-inside space-y-1 my-4 ml-4 text-gray-700">')
+    .replace(/<ul>/g, '<ul class="list-disc list-inside space-y-1 my-4 ml-4 text-gray-700 text-left">')
+    .replace(/<ol>/g, '<ol class="list-decimal list-inside space-y-1 my-4 ml-4 text-gray-700 text-left">')
     
     // 为代码添加样式
     .replace(/<code>/g, '<code class="bg-gray-100 text-red-600 px-1 py-0.5 rounded text-sm font-mono">')
