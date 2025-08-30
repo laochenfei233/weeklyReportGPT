@@ -6,13 +6,6 @@ export const config = {
   maxDuration: 10, // 10秒超时（免费计划限制）
 };
 
-// Validate environment variables
-if (process.env.NEXT_PUBLIC_USE_USER_KEY !== "true") {
-  if (!process.env.OPENAI_API_KEY) {
-    throw new Error("Missing OPENAI_API_KEY environment variable");
-  }
-}
-
 interface CustomConfig {
   apiKey?: string;
   apiBase?: string;
@@ -26,6 +19,8 @@ interface RequestBody {
   temperature?: number;
   max_tokens?: number;
   customConfig?: CustomConfig;
+  chunkIndex?: number;
+  totalChunks?: number;
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -40,7 +35,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       model,
       temperature = 0.7,
       max_tokens,
-      customConfig
+      customConfig,
+      chunkIndex = 0,
+      totalChunks = 1
     } = req.body as RequestBody;
 
     if (!prompt || prompt.trim().length === 0) {
@@ -55,7 +52,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const hasSystemKey = !!process.env.OPENAI_API_KEY;
     const hasUserKey = !!(customConfig?.apiKey || api_key);
     
-    // 如果启用了用户密钥模式但没有提供密钥，且系统也没有密钥，则报错
     if (useUserKey && !hasUserKey && !hasSystemKey) {
       return res.status(401).json({
         error: "请配置API密钥",
@@ -63,26 +59,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         details: "系统未配置默认API密钥，请在设置中配置您的API密钥"
       });
     }
-    
-    // 如果没有用户密钥但有系统密钥，使用系统密钥
-    if (!hasUserKey && hasSystemKey) {
-      console.log('使用系统配置的API密钥');
-    }
 
-    // System prompt for weekly report generation
-    const systemPrompt = "你是一个专业的周报生成助手。请帮我把以下的工作内容填充为一篇完整的周报，请直接用markdown格式以分点叙述的形式输出，内容要专业、详细且条理清晰。";
+    // 根据分块调整提示词
+    let systemPrompt = "你是一个专业的周报生成助手。";
+    let adjustedPrompt = prompt;
+    
+    if (totalChunks > 1) {
+      if (chunkIndex === 0) {
+        systemPrompt += "请生成周报的开头部分，包括标题和本周工作总结。";
+        adjustedPrompt = `请为以下工作内容生成周报的开头部分（标题和工作总结）：\n\n${prompt}`;
+      } else if (chunkIndex === totalChunks - 1) {
+        systemPrompt += "请生成周报的结尾部分，包括下周计划和总结。";
+        adjustedPrompt = `请为以下工作内容生成周报的结尾部分（下周计划和总结）：\n\n${prompt}`;
+      } else {
+        systemPrompt += `请生成周报的第${chunkIndex + 1}部分内容。`;
+        adjustedPrompt = `请为以下工作内容生成周报的第${chunkIndex + 1}部分：\n\n${prompt}`;
+      }
+    } else {
+      systemPrompt += "请帮我把以下的工作内容填充为一篇完整的周报，请直接用markdown格式以分点叙述的形式输出，内容要专业、详细且条理清晰。";
+    }
     
     const payload: OpenAIStreamPayload = {
       model: model || customConfig?.model || process.env.OPENAI_MODEL || "gpt-3.5-turbo",
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: prompt }
+        { role: "user", content: adjustedPrompt }
       ],
       temperature,
       top_p: 1,
       frequency_penalty: 0,
       presence_penalty: 0,
-      max_tokens: max_tokens || parseInt(process.env.MAX_TOKENS || "2000"),
+      max_tokens: Math.min(max_tokens || parseInt(process.env.MAX_TOKENS || "1000"), 1000), // 限制token数量
       stream: true,
       n: 1,
       api_key: customConfig?.apiKey || api_key,
@@ -95,13 +102,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Chunk-Index', chunkIndex.toString());
+    res.setHeader('X-Total-Chunks', totalChunks.toString());
     
-    // Stream the response
+    // Stream the response with timeout protection
     const reader = stream.getReader();
     const decoder = new TextDecoder();
+    const startTime = Date.now();
+    const maxTime = 8000; // 8秒内必须完成
     
     try {
       while (true) {
+        if (Date.now() - startTime > maxTime) {
+          console.log('Chunk generation timeout, ending stream');
+          break;
+        }
+        
         const { done, value } = await reader.read();
         if (done) break;
         
@@ -122,7 +138,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (error instanceof Error) {
       errorMessage = error.message;
       
-      // Handle specific error types
       if (error.message.includes("API key")) {
         statusCode = 401;
         errorMessage = "API密钥无效或未配置";
