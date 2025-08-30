@@ -38,18 +38,9 @@
    - `OPENAI_MODEL` = `gpt-3.5-turbo`
    - `NEXT_PUBLIC_USE_USER_KEY` = `false`
 
-4. **JWT密钥配置（3种方式任选其一）**
-   
-   **🚀 自动生成（推荐）**：
-   - 部署完成后访问 `https://your-app.vercel.app/auto-init`
-   - 系统自动生成JWT密钥并显示配置步骤
-   
-   **🎲 手动生成**：
-   - 访问 `https://your-app.vercel.app/generate-jwt`
-   - 点击"生成新密钥"按钮
-   
-   **⚙️ 自定义设置**：
-   - 手动设置环境变量 `JWT_SECRET`
+4. **部署完成**
+   - JWT密钥会在部署时自动生成
+   - 无需手动配置认证相关环境变量
 
 5. **部署**
    - 点击"Deploy"
@@ -70,8 +61,7 @@
 | `OPENAI_API_BASE` | `https://api.openai.com/v1` | API基础URL |
 | `OPENAI_MODEL` | `gpt-3.5-turbo` | 使用的模型 |
 | `NEXT_PUBLIC_USE_USER_KEY` | `false` | 是否允许用户自定义API密钥 |
-| `JWT_SECRET` | 自动生成 | JWT签名密钥 |
-| `SESSION_DURATION_DAYS` | `14` | 会话持续时间（天） |
+
 | `REQUEST_TIMEOUT` | `30000` | 请求超时时间（毫秒） |
 | `MAX_TOKENS` | `2000` | 最大生成token数 |
 
@@ -114,9 +104,7 @@ OPENAI_MODEL=glm-4
 - 访问 `/debug` 页面进行系统诊断
 - 查看Vercel Functions日志
 
-**2. "JWT密钥未配置"**
-- 访问 `/auto-init` 页面自动生成
-- 或手动设置 `JWT_SECRET` 环境变量
+
 
 **3. "API连接失败"**
 - 检查 `OPENAI_API_BASE` 是否正确
@@ -127,15 +115,14 @@ OPENAI_MODEL=glm-4
 
 - **系统诊断**: `/debug`
 - **健康检查**: `/api/health`
-- **自动初始化**: `/auto-init`
-- **JWT生成**: `/generate-jwt`
+
 
 ## 📱 使用指南
 
 部署完成后：
 
 1. **访问应用**: `https://your-app.vercel.app`
-2. **管理员登录**: 点击"管理"按钮
+2. **管理员登录**: 点击设置按钮，在管理员板块通过验证码登录（查看 [管理员登录指南](Admin-Login)）
 3. **生成周报**: 输入工作内容，点击生成
 4. **个性化设置**: 访问设置页面配置偏好
 

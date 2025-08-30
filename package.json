@@ -13,9 +13,8 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "setup": "node scripts/setup.js",
-    "generate-jwt-secret": "node scripts/generate-jwt-secret.js",
-    "add-username-field": "node scripts/add-username-field.js",
-    "auto-setup-jwt": "node scripts/auto-setup-jwt.js"
+    "auto-setup-jwt": "node scripts/auto-setup-jwt.js",
+    "sync-wiki": "node scripts/sync-wiki.js"
   },
   "dependencies": {
     "@headlessui/react": "^2.1.10",
@@ -25,14 +24,11 @@
     "@tailwindcss/typography": "^0.5.16",
     "@vercel/analytics": "^1.3.1",
     "@vercel/kv": "^3.0.0",
-    "@vercel/postgres": "^0.10.0",
-    "bcryptjs": "^2.4.3",
     "eventsource-parser": "^1.1.2",
     "framer-motion": "^11.11.17",
     "jsonwebtoken": "^9.0.2",
     "marked": "^14.1.3",
     "next": "^15.1.0",
-    "next-auth": "^4.24.10",
     "next-intl": "^3.22.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -42,7 +38,6 @@
     "react-use-measure": "^2.1.1"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/marked": "^6.0.0",
     "@types/node": "^22.10.1",

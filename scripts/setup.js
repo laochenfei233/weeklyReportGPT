@@ -33,22 +33,16 @@ const secret = crypto.randomBytes(64).toString('hex');
 // 读取 .env 文件内容
 let envContent = fs.readFileSync(envPath, 'utf8');
 
-// 替换 JWT_SECRET
-if (envContent.includes('JWT_SECRET=your-jwt-secret-key-change-in-production')) {
-  envContent = envContent.replace(
-    'JWT_SECRET=your-jwt-secret-key-change-in-production',
-    `JWT_SECRET=${secret}`
-  );
-  fs.writeFileSync(envPath, envContent);
-  console.log('✅ JWT_SECRET 已自动配置');
-} else if (envContent.includes('JWT_SECRET=')) {
-  console.log('⚠️  JWT_SECRET 已存在，跳过自动配置');
+// 替换或添加 JWT_SECRET
+if (envContent.includes('JWT_SECRET=')) {
+  envContent = envContent.replace(/JWT_SECRET=.*/g, `JWT_SECRET=${secret}`);
+  console.log('✅ JWT_SECRET 已更新');
 } else {
-  // 如果没有 JWT_SECRET 行，添加它
   envContent += `\n# Authentication Configuration\nJWT_SECRET=${secret}\n`;
-  fs.writeFileSync(envPath, envContent);
-  console.log('✅ JWT_SECRET 已添加到 .env 文件');
+  console.log('✅ JWT_SECRET 已添加');
 }
+
+fs.writeFileSync(envPath, envContent);
 
 console.log('');
 console.log('📝 接下来的步骤:');
@@ -63,6 +57,8 @@ console.log('3️⃣  访问应用:');
 console.log('   http://localhost:3000');
 console.log('');
 console.log('4️⃣  管理员登录:');
-console.log('   点击"管理"按钮，使用验证码登录');
+console.log('   点击设置按钮，在管理员板块获取验证码并登录');
+console.log('');
+
 console.log('');
 console.log('🎉 设置完成！开始使用 Weekly Report GPT 吧！');

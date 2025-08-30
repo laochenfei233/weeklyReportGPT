@@ -6,13 +6,13 @@ import { useTranslations } from 'next-intl'
 import { Toaster, toast } from "react-hot-toast";
 import Footer from "../components/Footer";
 import Github from "../components/GitHub";
-import LoginModal from "../components/LoginModal";
-import UsageRulesModal from "../components/UsageRulesModal";
+import SettingsModal from "../components/SettingsModal";
 import Header from "../components/Header";
 import LoadingDots from "../components/LoadingDots";
 import ResizablePanel from "../components/ResizablePanel";
-import { useAuthState } from "../hooks/useAuth";
 import MarkdownRenderer from "../components/MarkdownRenderer";
+import { useSettings } from "../contexts/SettingsContext";
+import { useAuthState } from "../hooks/useAuth";
 
 interface UserSettings {
   fontSize: 'small' | 'medium' | 'large';
@@ -26,15 +26,17 @@ interface UserSettings {
 
 const Home: NextPage = () => {
   const t = useTranslations('Index')
-  const { user, isLoading: authLoading, refreshUser } = useAuthState();
+  const { user, isLoading: authLoading } = useAuthState();
 
   const [loading, setLoading] = useState(false);
   const [chat, setChat] = useState("");
   const [api_key, setAPIKey] = useState("")
   const [generatedChat, setGeneratedChat] = useState<String>("");
   const [userSettings, setUserSettings] = useState<UserSettings | null>(null);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showRulesModal, setShowRulesModal] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  
+  // 使用设置上下文
+  const { locale, autoSave, showLineNumbers } = useSettings();
 
   // 加载用户设置
   useEffect(() => {
@@ -47,16 +49,6 @@ const Home: NextPage = () => {
       }
     }
   }, []);
-
-  // 检查是否需要显示使用规则弹窗
-  useEffect(() => {
-    if (!authLoading) {
-      const rulesAccepted = localStorage.getItem('usage_rules_accepted');
-      if (!rulesAccepted) {
-        setShowRulesModal(true);
-      }
-    }
-  }, [authLoading]);
 
 
 
@@ -85,14 +77,14 @@ const Home: NextPage = () => {
     setGeneratedChat("");
     setLoading(true);
 
-    // 检查是否需要登录或配置API
+    // 检查API配置
     const hasSystemKey = process.env.NEXT_PUBLIC_USE_USER_KEY !== "true";
     const hasUserConfig = userSettings?.useCustomConfig && userSettings.customApiKey;
     const hasUserKey = useUserKey && api_key;
     
-    if (!user && !hasUserConfig && !hasSystemKey && !hasUserKey) {
-      toast.error("请先登录或配置API密钥");
-      setShowLoginModal(true);
+    if (!hasUserConfig && !hasSystemKey && !hasUserKey) {
+      toast.error("请先配置API密钥");
+      setShowSettings(true);
       setLoading(false);
       return;
     }
@@ -139,14 +131,8 @@ const Home: NextPage = () => {
       try {
         const errorData = await response.json();
         
-        if (errorData.code === 'DAILY_LIMIT_EXCEEDED') {
-          toast.error(`今日使用量已达上限 (${errorData.usage}/${errorData.limit} tokens)`);
-          // 刷新用户统计信息
-          refreshUser();
-        } else {
-          const errorMessage = errorData.error || "服务繁忙，请稍后再试";
-          toast.error(errorMessage);
-        }
+        const errorMessage = errorData.error || "服务繁忙，请稍后再试";
+        toast.error(errorMessage);
         console.error("API Error:", errorData);
       } catch (e) {
         toast.error("服务繁忙，请稍后再试");
@@ -208,7 +194,9 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Header />
+      <Header 
+        onSettingsClick={() => setShowSettings(true)}
+      />
       <main className="flex flex-1 w-full flex-col items-center justify-center text-center px-4 mt-12 sm:mt-20">
         
 
@@ -230,17 +218,16 @@ const Home: NextPage = () => {
         </h1>
         <p className="text-slate-500 mt-5">{t('slogan')}</p>
 
-        {/* 用户状态显示 */}
+        {/* 管理员状态显示 */}
         {user && (
           <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200 max-w-xl">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-blue-800">
-                  欢迎回来，{user.email}
-                  {user.isAdmin && <span className="ml-2 px-2 py-1 bg-blue-600 text-white text-xs rounded">管理员</span>}
+                  欢迎回来，管理员
                 </p>
                 <p className="text-xs text-green-600 mt-1">
-                  ✅ 管理员账户，无token使用限制
+                  ✅ 管理员账户，无使用限制
                 </p>
               </div>
             </div>
@@ -256,18 +243,13 @@ const Home: NextPage = () => {
                   管理员登录后可无限制使用
                 </p>
                 <p className="text-xs text-blue-600 mt-1">
-                  或在设置中配置自己的API密钥
+                  点击右上角设置按钮进行管理员登录或配置API密钥
                 </p>
               </div>
-              <button
-                onClick={() => setShowLoginModal(true)}
-                className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
-              >
-                管理
-              </button>
             </div>
           </div>
         )}
+
 
 
         <div className="max-w-xl w-full">
@@ -398,23 +380,10 @@ const Home: NextPage = () => {
       </main>
       <Footer />
 
-      {/* 登录弹窗 */}
-      <LoginModal
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-        onSuccess={(user) => {
-          refreshUser();
-          toast.success(`欢迎，${user.email}！`);
-        }}
-      />
-
-      {/* 使用规则弹窗 */}
-      <UsageRulesModal
-        isOpen={showRulesModal}
-        onClose={() => setShowRulesModal(false)}
-        onAccept={() => {
-          toast.success('欢迎使用 Weekly Report GPT！');
-        }}
+      {/* 设置弹窗 */}
+      <SettingsModal 
+        isOpen={showSettings} 
+        onClose={() => setShowSettings(false)} 
       />
     </div>
   );

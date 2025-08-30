@@ -5,6 +5,7 @@ import "../styles/globals.css";
 import "../styles/markdown.css";
 import { useEffect, useState } from 'react';
 import UsageRulesModal from '../components/UsageRulesModal';
+import { SettingsProvider } from '../contexts/SettingsContext';
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [showRulesModal, setShowRulesModal] = useState(false);
@@ -23,17 +24,19 @@ function MyApp({ Component, pageProps }: AppProps) {
   };
 
   return (
-    <IntlProvider
-      messages={pageProps.messages}
-      locale={pageProps.locale || 'en'}
-      >
-      <Component {...pageProps} />
-      <Analytics />
-      <UsageRulesModal
-        isOpen={showRulesModal}
-        onClose={handleCloseRulesModal}
-      />
-    </IntlProvider>
+    <SettingsProvider>
+      <IntlProvider
+        messages={pageProps.messages}
+        locale={pageProps.locale || 'en'}
+        >
+        <Component {...pageProps} />
+        <Analytics />
+        <UsageRulesModal
+          isOpen={showRulesModal}
+          onClose={handleCloseRulesModal}
+        />
+      </IntlProvider>
+    </SettingsProvider>
   );
 }
 

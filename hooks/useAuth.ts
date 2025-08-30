@@ -1,44 +1,18 @@
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useState, useEffect } from 'react';
+import { toast } from 'react-hot-toast';
 
-interface User {
+export interface User {
   id: string;
   email: string;
-  username: string;
   isAdmin: boolean;
-}
-
-interface UserStats {
-  todayUsage: number;
-  totalUsage: number;
-  weeklyUsage: Array<{ date: string; daily_total: number }>;
-  dailyLimit: number;
-}
-
-interface AuthContextType {
-  user: User | null;
-  stats: UserStats | null;
-  isLoading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => Promise<void>;
-  refreshUser: () => Promise<void>;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
 }
 
 export function useAuthState() {
   const [user, setUser] = useState<User | null>(null);
-  const [stats, setStats] = useState<UserStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchUser = async () => {
+  // 检查用户登录状态
+  const checkAuth = async () => {
     try {
       const response = await fetch('/api/auth/me', {
         credentials: 'include'
@@ -47,67 +21,87 @@ export function useAuthState() {
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
-        setStats(data.stats);
       } else {
         setUser(null);
-        setStats(null);
       }
     } catch (error) {
-      console.error('Fetch user error:', error);
       setUser(null);
-      setStats(null);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  // 管理员登录
+  const adminLogin = async (code: string) => {
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('/api/auth/admin-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ action: 'verify_code', code }),
         credentials: 'include'
       });
 
+      const data = await response.json();
+      
       if (response.ok) {
-        await fetchUser();
-        return true;
+        setUser(data.user);
+        return data.user;
+      } else {
+        throw new Error(data.error || '登录失败');
       }
-      return false;
     } catch (error) {
-      console.error('Login error:', error);
-      return false;
+      throw error;
     }
   };
 
+  // 请求验证码
+  const requestVerificationCode = async () => {
+    try {
+      const response = await fetch('/api/auth/admin-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'request_code' })
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        return data;
+      } else {
+        throw new Error(data.error || '请求验证码失败');
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  // 登出
   const logout = async () => {
     try {
-      await fetch('/api/auth/logout', {
-        method: 'POST',
+      await fetch('/api/auth/admin-login', {
+        method: 'DELETE',
         credentials: 'include'
       });
+      setUser(null);
     } catch (error) {
       console.error('Logout error:', error);
-    } finally {
-      setUser(null);
-      setStats(null);
     }
   };
 
-  const refreshUser = async () => {
-    await fetchUser();
+  // 刷新用户信息
+  const refreshUser = () => {
+    checkAuth();
   };
 
   useEffect(() => {
-    fetchUser();
+    checkAuth();
   }, []);
 
   return {
     user,
-    stats,
     isLoading,
-    login,
+    adminLogin,
+    requestVerificationCode,
     logout,
     refreshUser
   };

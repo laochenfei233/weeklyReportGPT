@@ -1,80 +1,48 @@
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { NextApiRequest } from 'next';
-import { getJWTSecret } from './jwt-auto-generate';
 
-const JWT_SECRET = getJWTSecret();
-
-export interface AuthUser {
+export interface User {
   id: string;
   email: string;
-  username?: string;
   isAdmin: boolean;
 }
 
-// 密码哈希
-export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, 12);
-}
-
-// 验证密码
-export async function verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
-  return bcrypt.compare(password, hashedPassword);
+// 生成JWT密钥（如果不存在）
+export function getJWTSecret(): string {
+  if (process.env.JWT_SECRET) {
+    return process.env.JWT_SECRET;
+  }
+  
+  // 在运行时生成临时密钥（仅用于开发）
+  const crypto = require('crypto');
+  return crypto.randomBytes(64).toString('hex');
 }
 
 // 生成JWT token
-export function generateToken(user: AuthUser): string {
-  const sessionDurationDays = parseInt(process.env.SESSION_DURATION_DAYS || '14');
-  return jwt.sign(
-    {
-      id: user.id,
-      email: user.email,
-      isAdmin: user.isAdmin
-    },
-    JWT_SECRET,
-    { expiresIn: `${sessionDurationDays}d` }
-  );
+export function generateToken(user: User): string {
+  const secret = getJWTSecret();
+  return jwt.sign(user, secret, { expiresIn: '7d' });
 }
 
 // 验证JWT token
-export function verifyToken(token: string): AuthUser | null {
+export function verifyToken(token: string): User | null {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
-    return {
-      id: decoded.id,
-      email: decoded.email,
-      isAdmin: decoded.isAdmin
-    };
+    const secret = getJWTSecret();
+    return jwt.verify(token, secret) as User;
   } catch (error) {
     return null;
   }
 }
 
 // 从请求中获取用户信息
-export function getUserFromRequest(req: NextApiRequest): AuthUser | null {
-  const token = req.headers.authorization?.replace('Bearer ', '') || 
-                req.cookies.auth_token;
-  
+export function getUserFromRequest(req: NextApiRequest): User | null {
+  const token = req.cookies.auth_token;
   if (!token) return null;
   
   return verifyToken(token);
 }
 
-// 验证邮箱格式
-export function isValidEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
-
-// 验证密码强度
-export function isValidPassword(password: string): { valid: boolean; message?: string } {
-  if (password.length < 6) {
-    return { valid: false, message: '密码至少需要6个字符' };
-  }
-  
-  if (!/(?=.*[a-zA-Z])(?=.*\d)/.test(password)) {
-    return { valid: false, message: '密码需要包含字母和数字' };
-  }
-  
-  return { valid: true };
+// 生成验证码
+export function generateVerificationCode(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
 }

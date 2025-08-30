@@ -12,6 +12,50 @@
   text-align: left;
 }
 
+/* 暗色主题支持 */
+.dark .markdown-content {
+  color: #e5e7eb;
+}
+
+.dark .markdown-content h1,
+.dark .markdown-content h2,
+.dark .markdown-content h3,
+.dark .markdown-content h4,
+.dark .markdown-content h5,
+.dark .markdown-content h6 {
+  color: #f9fafb;
+  border-color: #374151;
+}
+
+.dark .markdown-content code {
+  background-color: #374151;
+  color: #e5e7eb;
+}
+
+.dark .markdown-content pre {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+.dark .markdown-content blockquote {
+  border-color: #6b7280;
+  color: #d1d5db;
+}
+
+.dark .markdown-content table {
+  border-color: #374151;
+}
+
+.dark .markdown-content th,
+.dark .markdown-content td {
+  border-color: #374151;
+  background-color: #1f2937;
+}
+
+.dark .markdown-content th {
+  background-color: #374151;
+}
+
 /* 标题样式 */
 .markdown-content h1,
 .markdown-content h2,
