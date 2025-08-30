@@ -5,7 +5,7 @@ const nextConfig = {
     locales: ['en', 'zh'],
     defaultLocale: 'en',
   },
-  output: 'standalone',
+
   serverExternalPackages: [],
   env: {
     OPENAI_API_BASE: process.env.OPENAI_API_BASE,

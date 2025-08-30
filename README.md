@@ -119,7 +119,11 @@ npm run dev
 **必需的环境变量：**
 - `OPENAI_API_KEY` = `your-api-key-here`
 - `NEXT_PUBLIC_USE_USER_KEY` = `false`
-- `JWT_SECRET` = `生成的64字节随机字符串`
+
+**JWT密钥配置（3种方式）：**
+- 🚀 **自动生成**：部署后访问 `https://your-app.vercel.app/auto-init` 自动生成
+- 🎲 **手动生成**：访问 `https://your-app.vercel.app/generate-jwt` 手动生成
+- ⚙️ **自定义设置**：手动设置 `JWT_SECRET` 环境变量
 
 **可选的环境变量：**
 - `OPENAI_API_BASE` = `https://api.openai.com/v1`

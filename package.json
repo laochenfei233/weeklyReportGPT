@@ -7,13 +7,14 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run auto-setup-jwt && next build",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "setup": "node scripts/setup.js",
     "generate-jwt-secret": "node scripts/generate-jwt-secret.js",
-    "add-username-field": "node scripts/add-username-field.js"
+    "add-username-field": "node scripts/add-username-field.js",
+    "auto-setup-jwt": "node scripts/auto-setup-jwt.js"
   },
   "dependencies": {
     "@headlessui/react": "^2.1.10",
