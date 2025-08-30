@@ -1,12 +1,14 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { NextApiRequest } from 'next';
+import { getJWTSecret } from './jwt-auto-generate';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_SECRET = getJWTSecret();
 
 export interface AuthUser {
   id: string;
   email: string;
+  username?: string;
   isAdmin: boolean;
 }
 
@@ -22,6 +24,7 @@ export async function verifyPassword(password: string, hashedPassword: string): 
 
 // 生成JWT token
 export function generateToken(user: AuthUser): string {
+  const sessionDurationDays = parseInt(process.env.SESSION_DURATION_DAYS || '14');
   return jwt.sign(
     {
       id: user.id,
@@ -29,7 +32,7 @@ export function generateToken(user: AuthUser): string {
       isAdmin: user.isAdmin
     },
     JWT_SECRET,
-    { expiresIn: '7d' }
+    { expiresIn: `${sessionDurationDays}d` }
   );
 }
 

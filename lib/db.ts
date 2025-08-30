@@ -4,12 +4,22 @@ import { hashPassword } from './auth';
 export interface User {
   id: string;
   email: string;
+  username?: string;
   password_hash: string;
   is_admin: boolean;
+  email_verified: boolean;
   daily_token_usage: number;
   last_usage_date: string;
   created_at: string;
   updated_at: string;
+}
+
+export interface EmailVerification {
+  id: string;
+  email: string;
+  code: string;
+  expires_at: string;
+  created_at: string;
 }
 
 export interface TokenUsage {
@@ -30,12 +40,25 @@ export async function initDatabase() {
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
         email VARCHAR(255) UNIQUE NOT NULL,
+        username VARCHAR(100) UNIQUE,
         password_hash VARCHAR(255) NOT NULL,
         is_admin BOOLEAN DEFAULT FALSE,
+        email_verified BOOLEAN DEFAULT FALSE,
         daily_token_usage INTEGER DEFAULT 0,
         last_usage_date DATE DEFAULT CURRENT_DATE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+
+    // 创建邮箱验证表
+    await sql`
+      CREATE TABLE IF NOT EXISTS email_verifications (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(255) NOT NULL,
+        code VARCHAR(10) NOT NULL,
+        expires_at TIMESTAMP NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `;
 
@@ -54,12 +77,15 @@ export async function initDatabase() {
 
     // 创建索引
     await sql`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_users_username ON users(username)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_email_verifications_email ON email_verifications(email)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_token_usage_user_date ON token_usage(user_id, date)`;
 
     // 创建默认管理员账户
     try {
-      const adminEmail = 'admin@123.com';
-      const adminPassword = 'admin';
+      const adminEmail = 'admin@example.com';
+      const adminUsername = 'admin';
+      const adminPassword = 'admin123';
       
       // 检查是否已存在管理员账户
       const existingAdmin = await sql`
@@ -70,10 +96,11 @@ export async function initDatabase() {
         // 创建管理员账户
         const passwordHash = await hashPassword(adminPassword);
         await sql`
-          INSERT INTO users (email, username, password_hash, is_admin)
-          VALUES (${adminEmail}, ${adminEmail}, ${passwordHash}, true)
+          INSERT INTO users (email, username, password_hash, is_admin, email_verified)
+          VALUES (${adminEmail}, ${adminUsername}, ${passwordHash}, true, true)
         `;
         console.log('Default admin user created successfully');
+        console.log('Admin credentials: admin@example.com / admin123');
       } else {
         console.log('Admin user already exists');
       }
@@ -223,5 +250,82 @@ export async function getUserStats(userId: string) {
       weeklyUsage: [],
       dailyLimit: 10000
     };
+  }
+}
+
+// 生成验证码
+export function generateVerificationCode(): string {
+  return Math.random().toString().slice(2, 8).padStart(6, '0');
+}
+
+// 保存邮箱验证码
+export async function saveEmailVerification(email: string, code: string): Promise<boolean> {
+  try {
+    // 删除旧的验证码
+    await sql`DELETE FROM email_verifications WHERE email = ${email}`;
+    
+    // 设置过期时间（10分钟后）
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+    
+    await sql`
+      INSERT INTO email_verifications (email, code, expires_at)
+      VALUES (${email}, ${code}, ${expiresAt})
+    `;
+    
+    return true;
+  } catch (error) {
+    console.error('Save email verification error:', error);
+    return false;
+  }
+}
+
+// 验证邮箱验证码
+export async function verifyEmailCode(email: string, code: string): Promise<boolean> {
+  try {
+    const result = await sql`
+      SELECT * FROM email_verifications 
+      WHERE email = ${email} AND code = ${code} AND expires_at > NOW()
+      LIMIT 1
+    `;
+    
+    if (result.rows.length > 0) {
+      // 删除已使用的验证码
+      await sql`DELETE FROM email_verifications WHERE email = ${email}`;
+      return true;
+    }
+    
+    return false;
+  } catch (error) {
+    console.error('Verify email code error:', error);
+    return false;
+  }
+}
+
+// 标记邮箱为已验证
+export async function markEmailAsVerified(email: string): Promise<boolean> {
+  try {
+    await sql`
+      UPDATE users SET email_verified = true, updated_at = NOW()
+      WHERE email = ${email}
+    `;
+    return true;
+  } catch (error) {
+    console.error('Mark email as verified error:', error);
+    return false;
+  }
+}
+
+// 通过用户名或邮箱获取用户
+export async function getUserByEmailOrUsername(identifier: string): Promise<User | null> {
+  try {
+    const result = await sql`
+      SELECT * FROM users 
+      WHERE email = ${identifier.toLowerCase()} OR username = ${identifier}
+      LIMIT 1
+    `;
+    return result.rows[0] as User || null;
+  } catch (error) {
+    console.error('Get user by email or username error:', error);
+    return null;
   }
 }
