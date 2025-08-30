@@ -33,7 +33,7 @@ interface RequestBody {
   customConfig?: CustomConfig;
 }
 
-const handler = async (req: Request): Promise<Response> => {
+export default async function handler(req: Request): Promise<Response> {
   try {
     if (req.method !== "POST") {
       return new Response("Method not allowed", { status: 405 });
@@ -139,4 +139,4 @@ const handler = async (req: Request): Promise<Response> => {
   }
 };
 
-export default handler;
+// Handler is now exported as default function above
