@@ -85,9 +85,13 @@ const Home: NextPage = () => {
     setGeneratedChat("");
     setLoading(true);
 
-    // 检查是否需要登录
-    if (!user && !userSettings?.useCustomConfig) {
-      toast.error("请先登录或配置自定义API");
+    // 检查是否需要登录或配置API
+    const hasSystemKey = process.env.NEXT_PUBLIC_USE_USER_KEY !== "true";
+    const hasUserConfig = userSettings?.useCustomConfig && userSettings.customApiKey;
+    const hasUserKey = useUserKey && api_key;
+    
+    if (!user && !hasUserConfig && !hasSystemKey && !hasUserKey) {
+      toast.error("请先登录或配置API密钥");
       setShowLoginModal(true);
       setLoading(false);
       return;

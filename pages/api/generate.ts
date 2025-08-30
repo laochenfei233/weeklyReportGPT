@@ -55,15 +55,26 @@ const handler = async (req: Request): Promise<Response> => {
     // 在 Edge Runtime 中跳过用户认证，避免 crypto 模块问题
     const user = null;
     
-    // 在 Edge Runtime 中简化认证检查
-    if (!customConfig?.apiKey && !api_key && process.env.NEXT_PUBLIC_USE_USER_KEY === "true") {
+    // 检查API密钥配置
+    const useUserKey = process.env.NEXT_PUBLIC_USE_USER_KEY === "true";
+    const hasSystemKey = !!process.env.OPENAI_API_KEY;
+    const hasUserKey = !!(customConfig?.apiKey || api_key);
+    
+    // 如果启用了用户密钥模式但没有提供密钥，且系统也没有密钥，则报错
+    if (useUserKey && !hasUserKey && !hasSystemKey) {
       return new Response(JSON.stringify({
         error: "请配置API密钥",
-        code: 'API_KEY_REQUIRED'
+        code: 'API_KEY_REQUIRED',
+        details: "系统未配置默认API密钥，请在设置中配置您的API密钥"
       }), {
         status: 401,
         headers: { "Content-Type": "application/json" }
       });
+    }
+    
+    // 如果没有用户密钥但有系统密钥，使用系统密钥
+    if (!hasUserKey && hasSystemKey) {
+      console.log('使用系统配置的API密钥');
     }
 
     // System prompt for weekly report generation
