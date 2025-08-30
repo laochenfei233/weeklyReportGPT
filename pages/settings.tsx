@@ -3,6 +3,7 @@ import Head from 'next/head';
 import Header from '../components/Header';
 import { toast } from 'react-hot-toast';
 import { API_PROVIDERS, validateAPIKey, getAPIKeyInfo } from '../utils/apiConfig';
+import { useAuthState } from '../hooks/useAuth';
 
 interface UserSettings {
   useCustomConfig: boolean;
@@ -12,6 +13,7 @@ interface UserSettings {
 }
 
 export default function Settings() {
+  const { user, isLoading: authLoading } = useAuthState();
   const [settings, setSettings] = useState<UserSettings>({
     useCustomConfig: false,
     customApiKey: '',
