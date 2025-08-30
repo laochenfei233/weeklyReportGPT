@@ -4,6 +4,7 @@
 
 ### 🎉 Vercel构建问题完全解决
 - **构建错误修复**: 解决了 `Cannot find module '/vercel/path0/scripts/auto-setup-jwt.js'` 错误
+- **模块导入修复**: 修复了 `Header.tsx` 中 `useSimpleAuth` 模块导入错误
 - **简化构建流程**: 移除构建时对本地脚本文件的依赖
 - **标准化构建**: 使用标准的 `next build` 命令，提升构建稳定性
 - **零依赖部署**: 实现真正的零配置部署体验
