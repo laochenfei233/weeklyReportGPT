@@ -27,7 +27,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   } = useSettings();
 
   const { user, adminLogin, requestVerificationCode, logout } = useAuthState();
-  const [activeTab, setActiveTab] = useState<'appearance' | 'language' | 'editor' | 'api' | 'about'>('appearance');
+  const [activeTab, setActiveTab] = useState<'appearance' | 'language' | 'editor' | 'api' | 'config' | 'about'>('appearance');
   const [verificationCode, setVerificationCode] = useState('');
   const [isRequestingCode, setIsRequestingCode] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -215,6 +215,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
     { id: 'language', name: locale === 'zh' ? '语言' : 'Language', icon: '🌐' },
     { id: 'editor', name: locale === 'zh' ? '编辑器' : 'Editor', icon: '📝' },
     { id: 'api', name: locale === 'zh' ? 'API配置' : 'API Config', icon: '🔌' },
+    { id: 'config', name: locale === 'zh' ? '配置管理' : 'Config Management', icon: '📦' },
     { id: 'about', name: locale === 'zh' ? '关于' : 'About', icon: 'ℹ️' }
   ];
 
@@ -361,37 +362,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                   </div>
                 </div>
 
-                {/* 配置导入导出 */}
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                    {locale === 'zh' ? '配置管理' : 'Configuration Management'}
-                  </h3>
-                  <div className="flex space-x-3">
-                    <button
-                      onClick={exportSettings}
-                      className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      <ArrowDownTrayIcon className="w-4 h-4" />
-                      <span>{locale === 'zh' ? '导出配置' : 'Export Settings'}</span>
-                    </button>
-                    <label className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors cursor-pointer">
-                      <ArrowUpTrayIcon className="w-4 h-4" />
-                      <span>{locale === 'zh' ? '导入配置' : 'Import Settings'}</span>
-                      <input
-                        type="file"
-                        accept=".json"
-                        onChange={importSettings}
-                        className="hidden"
-                      />
-                    </label>
-                  </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                    {locale === 'zh'
-                      ? '导出的配置文件包含所有个人设置，可在其他设备上导入使用'
-                      : 'Exported configuration includes all personal settings and can be imported on other devices'
-                    }
-                  </p>
-                </div>
+
               </div>
             )}
 
@@ -489,89 +460,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                   </div>
                 </div>
 
-                {/* 管理员登录 */}
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                    {locale === 'zh' ? '管理员登录' : 'Administrator Login'}
-                  </h3>
-                  <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-                    {user ? (
-                      // 已登录状态
-                      <div className="space-y-3">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                            管
-                          </div>
-                          <div>
-                            <div className="text-sm font-medium text-gray-900 dark:text-white">
-                              {locale === 'zh' ? '管理员已登录' : 'Administrator Logged In'}
-                            </div>
-                            <div className="text-xs text-green-600 dark:text-green-400">
-                              {locale === 'zh' ? '✅ 无Token限制' : '✅ Unlimited Token Usage'}
-                            </div>
-                          </div>
-                        </div>
-                        <button
-                          onClick={handleLogout}
-                          className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
-                        >
-                          {locale === 'zh' ? '退出登录' : 'Logout'}
-                        </button>
-                      </div>
-                    ) : (
-                      // 未登录状态
-                      <div className="space-y-4">
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
-                          {locale === 'zh' ? '管理员登录后可无限制使用Token' : 'Administrator login for unlimited token usage'}
-                        </div>
-                        <div className="bg-blue-50 dark:bg-blue-900 rounded-lg p-3 text-xs text-blue-800 dark:text-blue-200">
-                          <div className="font-medium mb-1">
-                            {locale === 'zh' ? '如何获取验证码：' : 'How to get verification code:'}
-                          </div>
-                          <ol className="list-decimal list-inside space-y-1">
-                            <li>{locale === 'zh' ? '点击"获取验证码"按钮' : 'Click "Get Code" button'}</li>
-                            <li>{locale === 'zh' ? '前往此项目的Vercel Dashboard → Logs' : 'Go to this project\'s Vercel Dashboard → Logs'}</li>
-                            <li>{locale === 'zh' ? '找到 "/api/auth/admin-login" 的请求日志' : 'Find "/api/auth/admin-login" request logs'}</li>
-                            <li>{locale === 'zh' ? '在日志中查看验证码' : 'View verification code in logs'}</li>
-                          </ol>
-                        </div>
-                        <div className="space-y-3">
-                          <button
-                            onClick={handleRequestCode}
-                            disabled={isRequestingCode}
-                            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
-                          >
-                            {isRequestingCode
-                              ? (locale === 'zh' ? '生成中...' : 'Generating...')
-                              : (locale === 'zh' ? '获取验证码' : 'Get Verification Code')
-                            }
-                          </button>
-                          <div className="flex space-x-2">
-                            <input
-                              type="text"
-                              value={verificationCode}
-                              onChange={(e) => setVerificationCode(e.target.value)}
-                              placeholder={locale === 'zh' ? '输入6位验证码' : 'Enter 6-digit code'}
-                              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white text-sm"
-                              maxLength={6}
-                            />
-                            <button
-                              onClick={handleLogin}
-                              disabled={isLoggingIn || !verificationCode.trim()}
-                              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
-                            >
-                              {isLoggingIn
-                                ? (locale === 'zh' ? '登录中...' : 'Logging in...')
-                                : (locale === 'zh' ? '登录' : 'Login')
-                              }
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
                 {/* 自定义API配置 */}
                 <div>
                   <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
@@ -665,6 +553,157 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                       >
                         {locale === 'zh' ? '保存API配置' : 'Save API Configuration'}
                       </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 管理员登录 */}
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                    {locale === 'zh' ? '管理员登录' : 'Administrator Login'}
+                  </h3>
+                  <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                    {user ? (
+                      // 已登录状态
+                      <div className="space-y-3">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                            管
+                          </div>
+                          <div>
+                            <div className="text-sm font-medium text-gray-900 dark:text-white">
+                              {locale === 'zh' ? '管理员已登录' : 'Administrator Logged In'}
+                            </div>
+                            <div className="text-xs text-green-600 dark:text-green-400">
+                              {locale === 'zh' ? '✅ 无Token限制' : '✅ Unlimited Token Usage'}
+                            </div>
+                          </div>
+                        </div>
+                        <button
+                          onClick={handleLogout}
+                          className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                        >
+                          {locale === 'zh' ? '退出登录' : 'Logout'}
+                        </button>
+                      </div>
+                    ) : (
+                      // 未登录状态
+                      <div className="space-y-4">
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          {locale === 'zh' ? '管理员登录后可无限制使用Token' : 'Administrator login for unlimited token usage'}
+                        </div>
+                        <div className="bg-blue-50 dark:bg-blue-900 rounded-lg p-3 text-xs text-blue-800 dark:text-blue-200">
+                          <div className="font-medium mb-1">
+                            {locale === 'zh' ? '如何获取验证码：' : 'How to get verification code:'}
+                          </div>
+                          <ol className="list-decimal list-inside space-y-1">
+                            <li>{locale === 'zh' ? '点击"获取验证码"按钮' : 'Click "Get Code" button'}</li>
+                            <li>{locale === 'zh' ? '前往此项目的Vercel Dashboard → Logs' : 'Go to this project\'s Vercel Dashboard → Logs'}</li>
+                            <li>{locale === 'zh' ? '找到 "/api/auth/admin-login" 的请求日志' : 'Find "/api/auth/admin-login" request logs'}</li>
+                            <li>{locale === 'zh' ? '在日志中查看验证码' : 'View verification code in logs'}</li>
+                          </ol>
+                        </div>
+                        <div className="space-y-3">
+                          <button
+                            onClick={handleRequestCode}
+                            disabled={isRequestingCode}
+                            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+                          >
+                            {isRequestingCode
+                              ? (locale === 'zh' ? '生成中...' : 'Generating...')
+                              : (locale === 'zh' ? '获取验证码' : 'Get Verification Code')
+                            }
+                          </button>
+                          <div className="flex space-x-2">
+                            <input
+                              type="text"
+                              value={verificationCode}
+                              onChange={(e) => setVerificationCode(e.target.value)}
+                              placeholder={locale === 'zh' ? '输入6位验证码' : 'Enter 6-digit code'}
+                              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white text-sm"
+                              maxLength={6}
+                            />
+                            <button
+                              onClick={handleLogin}
+                              disabled={isLoggingIn || !verificationCode.trim()}
+                              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+                            >
+                              {isLoggingIn
+                                ? (locale === 'zh' ? '登录中...' : 'Logging in...')
+                                : (locale === 'zh' ? '登录' : 'Login')
+                              }
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 配置管理 */}
+            {activeTab === 'config' && (
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                    {locale === 'zh' ? '配置管理' : 'Configuration Management'}
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                      <div className="flex items-start space-x-3">
+                        <div className="text-blue-600 dark:text-blue-400 text-lg">💾</div>
+                        <div>
+                          <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">
+                            {locale === 'zh' ? '配置备份与同步' : 'Configuration Backup & Sync'}
+                          </h4>
+                          <p className="text-xs text-blue-700 dark:text-blue-300">
+                            {locale === 'zh'
+                              ? '导出配置文件可备份所有个人设置，支持跨设备导入使用'
+                              : 'Export configuration files to backup all personal settings, supports cross-device import'
+                            }
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <button
+                        onClick={exportSettings}
+                        className="flex items-center justify-center space-x-3 p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        <ArrowDownTrayIcon className="w-5 h-5" />
+                        <div className="text-left">
+                          <div className="font-medium">{locale === 'zh' ? '导出配置' : 'Export Settings'}</div>
+                          <div className="text-xs opacity-90">{locale === 'zh' ? '保存到本地文件' : 'Save to local file'}</div>
+                        </div>
+                      </button>
+
+                      <label className="flex items-center justify-center space-x-3 p-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors cursor-pointer">
+                        <ArrowUpTrayIcon className="w-5 h-5" />
+                        <div className="text-left">
+                          <div className="font-medium">{locale === 'zh' ? '导入配置' : 'Import Settings'}</div>
+                          <div className="text-xs opacity-90">{locale === 'zh' ? '从本地文件恢复' : 'Restore from local file'}</div>
+                        </div>
+                        <input
+                          type="file"
+                          accept=".json"
+                          onChange={importSettings}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+
+                    <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                      <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
+                        {locale === 'zh' ? '配置文件包含内容：' : 'Configuration file includes:'}
+                      </h4>
+                      <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                        <li>• {locale === 'zh' ? '外观设置（主题、字体等）' : 'Appearance settings (theme, fonts, etc.)'}</li>
+                        <li>• {locale === 'zh' ? '语言偏好' : 'Language preferences'}</li>
+                        <li>• {locale === 'zh' ? '编辑器选项' : 'Editor options'}</li>
+                        <li>• {locale === 'zh' ? 'API配置（仅在启用时）' : 'API configuration (only when enabled)'}</li>
+                      </ul>
                     </div>
                   </div>
                 </div>

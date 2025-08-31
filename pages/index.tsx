@@ -224,10 +224,10 @@ const Home: NextPage = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-blue-800">
-                  欢迎回来，管理员
+                  {locale === 'zh' ? '欢迎回来，管理员' : 'Welcome back, Administrator'}
                 </p>
                 <p className="text-xs text-green-600 mt-1">
-                  ✅ 管理员账户，无使用限制
+                  {locale === 'zh' ? '✅ 管理员账户，无Token限制' : '✅ Administrator account, unlimited tokens'}
                 </p>
               </div>
             </div>
@@ -236,14 +236,17 @@ const Home: NextPage = () => {
 
         {/* 未登录提示 */}
         {!authLoading && !user && (
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200 max-w-xl">
+          <div className="mt-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200 max-w-xl">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-blue-800">
-                  管理员登录后可无限制使用
+                <p className="text-sm text-yellow-800">
+                  {locale === 'zh' ? 'Token使用限制：每用户1万Token' : 'Token Limit: 10,000 tokens per user'}
                 </p>
-                <p className="text-xs text-blue-600 mt-1">
-                  点击右上角设置按钮进行管理员登录或配置API密钥
+                <p className="text-xs text-yellow-600 mt-1">
+                  {locale === 'zh' 
+                    ? '点击右上角设置按钮进行管理员登录或配置自定义API以解除限制' 
+                    : 'Click settings to login as admin or configure custom API to remove limits'
+                  }
                 </p>
               </div>
             </div>
