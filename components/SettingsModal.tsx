@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSettings } from '../contexts/SettingsContext';
 import { useAuthState } from '../hooks/useAuth';
 import { XMarkIcon, Cog6ToothIcon, ArrowDownTrayIcon, ArrowUpTrayIcon } from '@heroicons/react/24/outline';
@@ -27,7 +27,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   } = useSettings();
 
   const { user, adminLogin, requestVerificationCode, logout } = useAuthState();
-  const [activeTab, setActiveTab] = useState<'appearance' | 'language' | 'editor' | 'api' | 'admin' | 'about'>('appearance');
+  const [activeTab, setActiveTab] = useState<'appearance' | 'language' | 'editor' | 'api' | 'about'>('appearance');
   const [verificationCode, setVerificationCode] = useState('');
   const [isRequestingCode, setIsRequestingCode] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -58,6 +58,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
     return 'gpt-3.5-turbo';
   });
   const [selectedProvider, setSelectedProvider] = useState('openai');
+
+  // 当进入API配置页面时，自动展开自定义API配置
+  useEffect(() => {
+    if (activeTab === 'api' && !user && !useCustomAPI) {
+      // 如果用户未登录且未配置自定义API，自动展开配置选项
+      setUseCustomAPI(true);
+    }
+  }, [activeTab, user, useCustomAPI]);
 
   // 管理员登录功能
   const handleRequestCode = async () => {
@@ -207,7 +215,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
     { id: 'language', name: locale === 'zh' ? '语言' : 'Language', icon: '🌐' },
     { id: 'editor', name: locale === 'zh' ? '编辑器' : 'Editor', icon: '📝' },
     { id: 'api', name: locale === 'zh' ? 'API配置' : 'API Config', icon: '🔌' },
-    { id: 'admin', name: locale === 'zh' ? '管理员' : 'Admin', icon: '👤' },
     { id: 'about', name: locale === 'zh' ? '关于' : 'About', icon: 'ℹ️' }
   ];
 
@@ -464,101 +471,25 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
             {/* API配置 */}
             {activeTab === 'api' && (
               <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                    {locale === 'zh' ? 'API配置' : 'API Configuration'}
-                  </h3>
-                  <div className="space-y-4">
-                    <label className="flex items-center justify-between">
-                      <div>
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">
-                          {locale === 'zh' ? '使用自定义API' : 'Use Custom API'}
-                        </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">
-                          {locale === 'zh' ? '启用后可配置自己的API密钥和服务商' : 'Enable to configure your own API key and provider'}
-                        </div>
-                      </div>
-                      <input
-                        type="checkbox"
-                        checked={useCustomAPI}
-                        onChange={(e) => setUseCustomAPI(e.target.checked)}
-                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                      />
-                    </label>
-                    {useCustomAPI && (
-                      <div className="space-y-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                        {/* API服务商选择 */}
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            {locale === 'zh' ? 'API服务商' : 'API Provider'}
-                          </label>
-                          <select
-                            value={selectedProvider}
-                            onChange={(e) => handleProviderChange(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
-                          >
-                            {Object.entries(API_PROVIDERS).map(([key, provider]) => (
-                              <option key={key} value={key}>
-                                {provider.name}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        {/* API密钥 */}
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            {locale === 'zh' ? 'API密钥' : 'API Key'}
-                          </label>
-                          <input
-                            type="password"
-                            value={customAPIKey}
-                            onChange={(e) => setCustomAPIKey(e.target.value)}
-                            placeholder={locale === 'zh' ? '输入你的API密钥' : 'Enter your API key'}
-                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
-                          />
-                        </div>
-                        {/* API基础URL */}
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            {locale === 'zh' ? 'API基础URL' : 'API Base URL'}
-                          </label>
-                          <input
-                            type="text"
-                            value={customAPIBase}
-                            onChange={(e) => setCustomAPIBase(e.target.value)}
-                            placeholder="https://api.openai.com/v1"
-                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
-                          />
-                        </div>
-                        {/* 模型 */}
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            {locale === 'zh' ? '模型' : 'Model'}
-                          </label>
-                          <input
-                            type="text"
-                            value={customModel}
-                            onChange={(e) => setCustomModel(e.target.value)}
-                            placeholder="gpt-3.5-turbo"
-                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
-                          />
-                        </div>
-                        <button
-                          onClick={saveAPIConfig}
-                          className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                        >
-                          {locale === 'zh' ? '保存API配置' : 'Save API Configuration'}
-                        </button>
-                      </div>
-                    )}
+                {/* Token使用说明 */}
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="text-yellow-600 dark:text-yellow-400 text-lg">⚠️</div>
+                    <div>
+                      <h4 className="text-sm font-medium text-yellow-800 dark:text-yellow-200 mb-1">
+                        {locale === 'zh' ? 'Token使用限制' : 'Token Usage Limit'}
+                      </h4>
+                      <p className="text-xs text-yellow-700 dark:text-yellow-300">
+                        {locale === 'zh'
+                          ? '未登录管理员或未配置自定义API时，每个用户限制使用1万Token（包括输入和输出）'
+                          : 'Without admin login or custom API configuration, each user is limited to 10,000 tokens (including input and output)'
+                        }
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
 
-            {/* 管理员设置 */}
-            {activeTab === 'admin' && (
-              <div className="space-y-6">
+                {/* 管理员登录 */}
                 <div>
                   <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                     {locale === 'zh' ? '管理员登录' : 'Administrator Login'}
@@ -576,7 +507,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                               {locale === 'zh' ? '管理员已登录' : 'Administrator Logged In'}
                             </div>
                             <div className="text-xs text-green-600 dark:text-green-400">
-                              {locale === 'zh' ? '✅ 无使用限制' : '✅ Unlimited Usage'}
+                              {locale === 'zh' ? '✅ 无Token限制' : '✅ Unlimited Token Usage'}
                             </div>
                           </div>
                         </div>
@@ -591,7 +522,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                       // 未登录状态
                       <div className="space-y-4">
                         <div className="text-sm text-gray-600 dark:text-gray-400">
-                          {locale === 'zh' ? '管理员登录后可无限制使用所有功能' : 'Administrator login for unlimited access to all features'}
+                          {locale === 'zh' ? '管理员登录后可无限制使用Token' : 'Administrator login for unlimited token usage'}
                         </div>
                         <div className="bg-blue-50 dark:bg-blue-900 rounded-lg p-3 text-xs text-blue-800 dark:text-blue-200">
                           <div className="font-medium mb-1">
@@ -640,8 +571,107 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                     )}
                   </div>
                 </div>
+
+                {/* 自定义API配置 */}
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                    {locale === 'zh' ? '自定义API配置' : 'Custom API Configuration'}
+                  </h3>
+                  <div className="space-y-4">
+                    <label className="flex items-center justify-between">
+                      <div>
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                          {locale === 'zh' ? '使用自定义API' : 'Use Custom API'}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          {locale === 'zh' ? '配置自己的API密钥，无Token限制' : 'Configure your own API key for unlimited token usage'}
+                        </div>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={useCustomAPI}
+                        onChange={(e) => setUseCustomAPI(e.target.checked)}
+                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                      />
+                    </label>
+
+                    {/* 自动展开自定义API配置 */}
+                    <div className={`space-y-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg transition-all duration-300 ${useCustomAPI ? 'opacity-100' : 'opacity-50'
+                      }`}>
+                      {/* API服务商选择 */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          {locale === 'zh' ? 'API服务商' : 'API Provider'}
+                        </label>
+                        <select
+                          value={selectedProvider}
+                          onChange={(e) => handleProviderChange(e.target.value)}
+                          disabled={!useCustomAPI}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {Object.entries(API_PROVIDERS).map(([key, provider]) => (
+                            <option key={key} value={key}>
+                              {provider.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      {/* API密钥 */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          {locale === 'zh' ? 'API密钥' : 'API Key'}
+                        </label>
+                        <input
+                          type="password"
+                          value={customAPIKey}
+                          onChange={(e) => setCustomAPIKey(e.target.value)}
+                          placeholder={locale === 'zh' ? '输入你的API密钥' : 'Enter your API key'}
+                          disabled={!useCustomAPI}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                        />
+                      </div>
+                      {/* API基础URL */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          {locale === 'zh' ? 'API基础URL' : 'API Base URL'}
+                        </label>
+                        <input
+                          type="text"
+                          value={customAPIBase}
+                          onChange={(e) => setCustomAPIBase(e.target.value)}
+                          placeholder="https://api.openai.com/v1"
+                          disabled={!useCustomAPI}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                        />
+                      </div>
+                      {/* 模型 */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          {locale === 'zh' ? '模型' : 'Model'}
+                        </label>
+                        <input
+                          type="text"
+                          value={customModel}
+                          onChange={(e) => setCustomModel(e.target.value)}
+                          placeholder="gpt-3.5-turbo"
+                          disabled={!useCustomAPI}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                        />
+                      </div>
+                      <button
+                        onClick={saveAPIConfig}
+                        disabled={!useCustomAPI}
+                        className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {locale === 'zh' ? '保存API配置' : 'Save API Configuration'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
+
+
 
             {/* 关于 */}
             {activeTab === 'about' && (
