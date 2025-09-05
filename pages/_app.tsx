@@ -11,6 +11,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <IntlProvider
         messages={pageProps.messages}
         locale={pageProps.locale || 'en'}
+        timeZone="Asia/Shanghai"
         >
         <Component {...pageProps} />
         <Analytics />

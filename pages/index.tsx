@@ -34,6 +34,7 @@ const Home: NextPage = () => {
   const [generatedChat, setGeneratedChat] = useState<String>("");
   const [userSettings, setUserSettings] = useState<UserSettings | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [reportType, setReportType] = useState<"daily" | "weekly" | "monthly">("weekly");
   
   // 使用设置上下文
   const { locale, autoSave, showLineNumbers } = useSettings();
@@ -65,8 +66,15 @@ const Home: NextPage = () => {
       concise: "请简洁扼要地突出重点"
     };
     
+    const reportTypePrompts = {
+      daily: "请生成一份详细的工作日报",
+      weekly: "请生成一份完整的工作周报",
+      monthly: "请生成一份全面的工作月报"
+    };
+    
+    const typeInstruction = reportTypePrompts[reportType];
     const styleInstruction = stylePrompts[userSettings.responseStyle];
-    return `${styleInstruction}，${content}`;
+    return `${typeInstruction}，${styleInstruction}，${content}`;
   };
 
   const prompt = getStyledPrompt(chat);
@@ -278,7 +286,7 @@ const Home: NextPage = () => {
 
           <div className="flex mt-10 items-center space-x-3">
             <p className="text-left font-medium">
-              {t('step1')}{" "}
+              📝 {t('step1')}{" "}
             </p>
           </div>
 
@@ -291,6 +299,27 @@ const Home: NextPage = () => {
               t('placeholder')
             }
           />
+
+          <div className="flex justify-center space-x-4 my-4">
+            <button 
+              className={`px-4 py-2 rounded-md ${reportType === 'daily' ? 'bg-black text-white' : 'bg-gray-200'}`}
+              onClick={() => setReportType('daily')}
+            >
+              日报
+            </button>
+            <button 
+              className={`px-4 py-2 rounded-md ${reportType === 'weekly' ? 'bg-black text-white' : 'bg-gray-200'}`}
+              onClick={() => setReportType('weekly')}
+            >
+              周报
+            </button>
+            <button 
+              className={`px-4 py-2 rounded-md ${reportType === 'monthly' ? 'bg-black text-white' : 'bg-gray-200'}`}
+              onClick={() => setReportType('monthly')}
+            >
+              月报
+            </button>
+          </div>
 
           {!loading && (
             <button
