@@ -6,7 +6,11 @@ class MyDocument extends Document {
       <Html lang="en">
         <Head>
           {/* Google tag (gtag.js) */}
-          <script async src="https://www.googletagmanager.com/gtag/js?id=G-F0GCM1QNBF"></script>
+          <script 
+            async 
+            src="https://www.googletagmanager.com/gtag/js?id=G-F0GCM1QNBF"
+            strategy="afterInteractive"
+          />
           <script
             dangerouslySetInnerHTML={{
               __html: `
@@ -16,6 +20,7 @@ class MyDocument extends Document {
                 gtag('config', 'G-F0GCM1QNBF');
               `,
             }}
+            strategy="afterInteractive"
           />
           <link rel="icon" href="/favicon.ico" />
           <meta
