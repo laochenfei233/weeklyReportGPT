@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import Head from 'next/head';
 import { toast, Toaster } from 'react-hot-toast';
+import { useTheme } from '../../contexts/ThemeContext';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface TestResult {
   test: string;
@@ -12,6 +14,7 @@ interface TestResult {
 export default function Debug() {
   const [results, setResults] = useState<TestResult[]>([]);
   const [isRunning, setIsRunning] = useState(false);
+  const { theme } = useTheme();
 
   const updateResult = (test: string, status: TestResult['status'], message: string, details?: any) => {
     setResults(prev => {
@@ -124,19 +127,29 @@ export default function Debug() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className={`min-h-screen py-8 ${
+      theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
+    }`}>
       <Head>
         <title>系统调试 - Weekly Report GPT</title>
       </Head>
 
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-6">系统调试面板</h1>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6">
+        <div className={`rounded-lg shadow-sm border p-6 ${
+          theme === 'dark' 
+            ? 'bg-gray-800 border-gray-700' 
+            : 'bg-white border-gray-200'
+        }`}>
+          <h1 className={`text-2xl font-bold mb-6 ${
+            theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+          }`}>系统调试面板</h1>
           
           <div className="mb-6">
-            <button
+            <motion.button
               onClick={runTests}
               disabled={isRunning}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               className={`px-6 py-3 rounded-lg font-medium ${
                 isRunning 
                   ? 'bg-gray-400 cursor-not-allowed' 
@@ -151,10 +164,23 @@ export default function Debug() {
             <div className="space-y-4">
               <h2 className="text-lg font-semibold text-gray-800">测试结果</h2>
               
-              {results.map((result, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-4">
+              <AnimatePresence>
+                {results.map((result, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className={`border rounded-lg p-4 mb-3 ${
+                      theme === 'dark' 
+                        ? 'border-gray-700' 
+                        : 'border-gray-200'
+                    }`}
+                  >
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium text-gray-900">
+                    <h3 className={`font-medium ${
+                      theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>
                       {getStatusIcon(result.status)} {result.test}
                     </h3>
                     <span className={`text-sm font-medium ${getStatusColor(result.status)}`}>
@@ -168,11 +194,19 @@ export default function Debug() {
                   </p>
                   
                   {result.details && (
-                    <details className="text-xs text-gray-600">
-                      <summary className="cursor-pointer hover:text-gray-800">
+                    <details className={`text-xs ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                    }`}>
+                      <summary className={`cursor-pointer ${
+                        theme === 'dark' ? 'hover:text-gray-300' : 'hover:text-gray-800'
+                      }`}>
                         查看详细信息
                       </summary>
-                      <pre className="mt-2 p-2 bg-gray-100 rounded overflow-auto">
+                      <pre className={`mt-2 p-2 rounded overflow-auto ${
+                        theme === 'dark' 
+                          ? 'bg-gray-700 text-gray-200' 
+                          : 'bg-gray-100'
+                      }`}>
                         {JSON.stringify(result.details, null, 2)}
                       </pre>
                     </details>
@@ -182,9 +216,17 @@ export default function Debug() {
             </div>
           )}
 
-          <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-            <h3 className="font-medium text-blue-900 mb-2">使用说明</h3>
-            <ul className="text-sm text-blue-800 space-y-1">
+          <div className={`mt-8 p-4 rounded-lg ${
+            theme === 'dark' 
+              ? 'bg-blue-900 bg-opacity-30' 
+              : 'bg-blue-50'
+          }`}>
+            <h3 className={`font-medium mb-2 ${
+              theme === 'dark' ? 'text-blue-300' : 'text-blue-900'
+            }`}>使用说明</h3>
+            <ul className={`text-sm space-y-1 ${
+              theme === 'dark' ? 'text-blue-200' : 'text-blue-800'
+            }`}>
               <li>• 环境变量检查：验证API密钥和配置是否正确</li>
               <li>• API连接测试：测试与OpenAI API的连接状态</li>
               <li>• 周报生成测试：验证核心功能是否正常工作</li>

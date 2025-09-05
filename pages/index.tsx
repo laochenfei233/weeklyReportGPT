@@ -1,7 +1,8 @@
 import { AnimatePresence, motion } from "framer-motion";
 import type { NextPage } from "next";
 import Head from "next/head";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useTheme } from "../contexts/ThemeContext";
 import { useTranslations } from 'next-intl'
 import { Toaster, toast } from "react-hot-toast";
 import Footer from "../components/Footer";
@@ -35,6 +36,12 @@ const Home: NextPage = () => {
   const [userSettings, setUserSettings] = useState<UserSettings | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [reportType, setReportType] = useState<"daily" | "weekly" | "monthly">("weekly");
+  const { theme } = useTheme();
+  
+  // 使用useCallback优化事件处理
+  const handleReportTypeChange = useCallback((type: "daily" | "weekly" | "monthly") => {
+    setReportType(type);
+  }, []);
   
   // 使用设置上下文
   const { locale, autoSave, showLineNumbers } = useSettings();
@@ -196,7 +203,9 @@ const Home: NextPage = () => {
   };
 
   return (
-    <div className="flex max-w-5xl mx-auto flex-col items-center justify-center py-2 min-h-screen">
+    <div className={`flex max-w-5xl mx-auto flex-col items-center justify-center py-2 min-h-screen ${
+      theme === 'dark' ? 'bg-gray-900' : 'bg-white'
+    }`}>
       <Head>
         <title>{t('title')}</title>
         <link rel="icon" href="/favicon.ico" />
@@ -221,10 +230,16 @@ const Home: NextPage = () => {
 
 
 
-        <h1 className="sm:text-6xl text-4xl max-w-2xl font-bold text-slate-900">
+        <h1 className={`sm:text-6xl text-4xl max-w-2xl font-bold ${
+          theme === 'dark' ? 'text-gray-100' : 'text-slate-900'
+        }`}>
           {t('description1')} <br></br><div className=" px-4 py-2 sm:mt-3 mt-8  w-full"></div>{t('description2')}
         </h1>
-        <p className="text-slate-500 mt-5">{t('slogan')}</p>
+        <p className={`mt-5 ${
+          theme === 'dark' ? 'text-gray-400' : 'text-slate-500'
+        }`}>
+          {t('slogan')}
+        </p>
 
         {/* 管理员状态显示 */}
         {user && (
@@ -302,20 +317,44 @@ const Home: NextPage = () => {
 
           <div className="flex justify-center space-x-4 my-4">
             <button 
-              className={`px-4 py-2 rounded-md ${reportType === 'daily' ? 'bg-black text-white' : 'bg-gray-200'}`}
-              onClick={() => setReportType('daily')}
+              className={`px-4 py-2 rounded-md transition-colors ${
+                reportType === 'daily' 
+                  ? theme === 'dark' 
+                    ? 'bg-primary-600 text-white' 
+                    : 'bg-black text-white'
+                  : theme === 'dark'
+                    ? 'bg-gray-700 text-gray-200'
+                    : 'bg-gray-200'
+              }`}
+              onClick={() => handleReportTypeChange('daily')}
             >
               日报
             </button>
             <button 
-              className={`px-4 py-2 rounded-md ${reportType === 'weekly' ? 'bg-black text-white' : 'bg-gray-200'}`}
-              onClick={() => setReportType('weekly')}
+              className={`px-4 py-2 rounded-md transition-colors ${
+                reportType === 'weekly' 
+                  ? theme === 'dark' 
+                    ? 'bg-primary-600 text-white' 
+                    : 'bg-black text-white'
+                  : theme === 'dark'
+                    ? 'bg-gray-700 text-gray-200'
+                    : 'bg-gray-200'
+              }`}
+              onClick={() => handleReportTypeChange('weekly')}
             >
               周报
             </button>
             <button 
-              className={`px-4 py-2 rounded-md ${reportType === 'monthly' ? 'bg-black text-white' : 'bg-gray-200'}`}
-              onClick={() => setReportType('monthly')}
+              className={`px-4 py-2 rounded-md transition-colors ${
+                reportType === 'monthly' 
+                  ? theme === 'dark' 
+                    ? 'bg-primary-600 text-white' 
+                    : 'bg-black text-white'
+                  : theme === 'dark'
+                    ? 'bg-gray-700 text-gray-200'
+                    : 'bg-gray-200'
+              }`}
+              onClick={() => handleReportTypeChange('monthly')}
             >
               月报
             </button>
@@ -323,7 +362,11 @@ const Home: NextPage = () => {
 
           {!loading && (
             <button
-              className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-5 mt-8 hover:bg-black/80 w-full"
+              className={`rounded-xl font-medium px-4 py-2 sm:mt-5 mt-8 w-full transition-colors ${
+                theme === 'dark'
+                  ? 'bg-primary-600 text-white hover:bg-primary-700'
+                  : 'bg-black text-white hover:bg-black/80'
+              }`}
               onClick={(e) => generateChat(e)}
             >
               {t('simplifierButton')} &rarr;
@@ -374,9 +417,17 @@ const Home: NextPage = () => {
                     </h2>
                   </div>
                   <div className="space-y-8 flex flex-col items-center justify-center max-w-4xl mx-auto">
-                    <div className="w-full bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden typora-container">
+                    <div className={`w-full rounded-lg shadow-sm overflow-hidden typora-container ${
+                      theme === 'dark' 
+                        ? 'bg-gray-800 border-gray-700' 
+                        : 'bg-white border-gray-200'
+                    }`}>
                       {/* Typora风格的工具栏 */}
-                      <div className="bg-gray-50 border-b border-gray-200 px-4 py-2 flex justify-between items-center">
+                      <div className={`border-b px-4 py-2 flex justify-between items-center ${
+                        theme === 'dark'
+                          ? 'bg-gray-700 border-gray-600'
+                          : 'bg-gray-50 border-gray-200'
+                      }`}>
                         <div className="text-sm text-gray-600 font-medium">周报内容</div>
                         <button
                           onClick={() => {
@@ -392,7 +443,9 @@ const Home: NextPage = () => {
                       </div>
                       
                       {/* Typora风格的内容区域 */}
-                      <div className={`p-8 bg-white min-h-[400px] ${
+                      <div className={`p-8 min-h-[400px] ${
+                        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+                      } ${
                         userSettings?.fontSize === 'small' ? 'text-sm' :
                         userSettings?.fontSize === 'large' ? 'text-lg' : 'text-base'
                       }`}>
