@@ -1,0 +1,80 @@
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.setupSection, .verifySection {
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.inputField {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.button:hover {
+  background-color: #45a049;
+}
+
+.secondaryButton {
+  background-color: #f44336;
+}
+
+.secondaryButton:hover {
+  background-color: #d32f2f;
+}
+
+.error {
+  color: #f44336;
+  margin-top: 10px;
+}
+
+.success {
+  color: #4CAF50;
+  margin-top: 10px;
+}
+
+.qrCode {
+  margin: 20px auto;
+  display: block;
+}
+
+.ipOption {
+  margin: 15px 0;
+  padding: 10px;
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.ipOption label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.ipOption input[type="checkbox"] {
+  margin-right: 8px;
+}
