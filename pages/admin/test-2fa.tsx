@@ -29,8 +29,10 @@ export default function Test2FAPage() {
           {!isVerified ? (
             <Verify2FA 
               adminId={adminId}
-              onSuccess={() => setIsVerified(true)}
-              onUseCaptcha={() => alert('请使用验证码登录')}
+              onSuccess={(is2FAVerified) => {
+                alert(is2FAVerified ? '2FA验证成功' : '验证码验证成功')
+                setIsVerified(true)
+              }}
             />
           ) : (
             <div className={styles.success}>
