@@ -11,7 +11,7 @@ export default async function handler(
   switch (action) {
     case 'generate-captcha':
       const captcha = CaptchaService.generateCaptcha()
-      res.status(200).json({ image: captcha.image, id: captcha.id })
+      res.status(200).json({ text: captcha.text, id: captcha.id })
       break
 
     case 'verify-captcha':
