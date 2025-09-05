@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useState } from 'react'
 import { TOTPService } from '../../utils/auth/totp.service'
 import { CaptchaService } from '../../utils/auth/captcha.service'
 import styles from '../../styles/admin-2fa.module.css'
