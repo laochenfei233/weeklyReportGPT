@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { TOTPService } from '../../utils/auth/totp.service'
-import QRCode from 'qrcode.react'
+import { QRCodeSVG } from 'qrcode.react'
 import { CaptchaService } from '../../utils/auth/captcha.service'
 import styles from '../../styles/admin-2fa.module.css'
 
@@ -68,7 +68,7 @@ export const Enable2FA = ({ adminId }: { adminId: string }) => {
         <div>
           <h3>设置2FA验证</h3>
           <p>请使用认证APP扫描二维码:</p>
-          <QRCode value={otpAuthUrl} className={styles.qrCode} />
+          <QRCodeSVG value={otpAuthUrl} className={styles.qrCode} />
           <p>或手动输入密钥: {secret}</p>
           <button className={styles.button} onClick={() => setStep('verify')}>下一步</button>
         </div>
