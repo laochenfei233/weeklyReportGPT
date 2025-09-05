@@ -157,6 +157,7 @@ export default function Debug() {
               } text-white transition-colors`}
             >
               {isRunning ? '测试中...' : '开始系统测试'}
+            </motion.button>
             </button>
           </div>
 
