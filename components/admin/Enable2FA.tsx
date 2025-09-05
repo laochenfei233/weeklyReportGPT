@@ -5,6 +5,7 @@ import { QRCodeSVG } from 'qrcode.react'
 import { CaptchaService } from '../../utils/auth/captcha.service'
 import LoadingDots from '../LoadingDots'
 import { useTheme } from '../../contexts/ThemeContext'
+import styles from '../../styles/admin-2fa.module.css'
 
 export const Enable2FA = ({ adminId }: { adminId: string }) => {
   const [step, setStep] = useState<'captcha' | 'scan' | 'verify' | 'done'>('captcha')
@@ -87,7 +88,9 @@ export const Enable2FA = ({ adminId }: { adminId: string }) => {
           >
             {isSubmitting ? <LoadingDots color="white" /> : '提交'}
           </motion.button>
-          {error && <p className={styles.error}>{error}</p>}
+          {error && <p className={`text-sm mt-2 ${
+            theme === 'dark' ? 'text-red-400' : 'text-red-600'
+          }`}>{error}</p>}
         </div>
       )}
 
@@ -112,12 +115,13 @@ export const Enable2FA = ({ adminId }: { adminId: string }) => {
             />
           </motion.div>
           <p>或手动输入密钥: {secret}</p>
-          <button 
+          <motion.button
             className="w-full bg-black text-white font-medium py-2 px-4 rounded-md hover:bg-gray-800 transition-colors"
             onClick={() => setStep('verify')}
+            whileTap={{ scale: 0.98 }}
           >
             下一步
-          </button>
+          </motion.button>
         </div>
       )}
 
@@ -132,12 +136,13 @@ export const Enable2FA = ({ adminId }: { adminId: string }) => {
             onChange={(e) => setToken(e.target.value)}
             placeholder="6位验证码"
           />
-          <button 
+          <motion.button
             className="w-full bg-black text-white font-medium py-2 px-4 rounded-md hover:bg-gray-800 transition-colors"
             onClick={handleVerifyToken}
+            whileTap={{ scale: 0.98 }}
           >
             验证
-          </button>
+          </motion.button>
           {error && <p className={styles.error}>{error}</p>}
         </div>
       )}

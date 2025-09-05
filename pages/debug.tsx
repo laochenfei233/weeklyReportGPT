@@ -158,7 +158,6 @@ export default function Debug() {
             >
               {isRunning ? '测试中...' : '开始系统测试'}
             </motion.button>
-            </button>
           </div>
 
           {results.length > 0 && (
@@ -212,7 +211,7 @@ export default function Debug() {
                       </pre>
                     </details>
                   )}
-                </div>
+                </motion.div>
               ))}
             </div>
           )}

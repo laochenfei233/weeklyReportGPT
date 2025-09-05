@@ -142,8 +142,12 @@ export const Verify2FA = ({
               checked={isIPRestricted}
               onChange={() => setIsIPRestricted(!isIPRestricted)}
             />
-            <span className="text-sm text-gray-700">
-              启用IP限制 <span className="text-gray-500">({ipAddress})</span>
+            <span className={`text-sm ${
+              theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+            }`}>
+              启用IP限制 <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>
+                ({ipAddress})
+              </span>
             </span>
           </label>
         </div>
@@ -152,7 +156,9 @@ export const Verify2FA = ({
       <AnimatePresence>
         {error && (
           <motion.p
-            className="mt-2 text-sm text-red-600"
+            className={`mt-2 text-sm ${
+              theme === 'dark' ? 'text-red-400' : 'text-red-600'
+            }`}
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
