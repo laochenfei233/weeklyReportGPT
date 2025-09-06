@@ -135,26 +135,26 @@ export default function Debug() {
       </Head>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
-        <div className={`rounded-lg shadow-sm border p-6 ${
+        <div className={`rounded-xl shadow-md p-8 ${
           theme === 'dark' 
-            ? 'bg-gray-800 border-gray-700' 
-            : 'bg-white border-gray-200'
+            ? 'bg-gray-800 border border-gray-700' 
+            : 'bg-white border border-gray-200'
         }`}>
-          <h1 className={`text-2xl font-bold mb-6 ${
-            theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+          <h1 className={`text-3xl font-bold mb-8 ${
+            theme === 'dark' ? 'text-white' : 'text-gray-800'
           }`}>系统调试面板</h1>
           
           <div className="mb-6">
             <motion.button
               onClick={runTests}
               disabled={isRunning}
-              whileHover={{ scale: 1.02 }}
+              whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
-              className={`px-6 py-3 rounded-lg font-medium ${
+              className={`px-8 py-4 rounded-xl font-semibold ${
                 isRunning 
                   ? 'bg-gray-400 cursor-not-allowed' 
-                  : 'bg-blue-600 hover:bg-blue-700'
-              } text-white transition-colors`}
+                  : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700'
+              } text-white shadow-md transition-all`}
             >
               {isRunning ? '测试中...' : '开始系统测试'}
             </motion.button>
