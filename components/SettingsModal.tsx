@@ -72,10 +72,22 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
     setIsRequestingCode(true);
     try {
       await requestVerificationCode();
-      toast.success(locale === 'zh' ? '验证码已发送，请查看Vercel Function日志' : 'Verification code sent, check Vercel Function logs');
+      toast.success(locale === 'zh' ? '验证码已发送，请查看Vercel Function日志' : 'Verification code sent, check Vercel Function logs', {
+        style: {
+          background: '#333',
+          color: '#fff',
+          border: '1px solid #555'
+        }
+      });
     } catch (error) {
       console.error('Request code error:', error);
-      toast.error(locale === 'zh' ? '获取验证码失败' : 'Failed to get verification code');
+      toast.error(locale === 'zh' ? '获取验证码失败' : 'Failed to get verification code', {
+        style: {
+          background: '#333',
+          color: '#fff',
+          border: '1px solid #555'
+        }
+      });
     } finally {
       setIsRequestingCode(false);
     }
@@ -91,12 +103,24 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
     try {
       const user = await adminLogin(verificationCode);
       if (user) {
-        toast.success('登录成功');
+        toast.success('登录成功', {
+        style: {
+          background: '#333',
+          color: '#fff',
+          border: '1px solid #555'
+        }
+      });
         setVerificationCode('');
       }
     } catch (error) {
       console.error('Login error:', error);
-      toast.error(locale === 'zh' ? '登录失败，请检查验证码' : 'Login failed, please check verification code');
+      toast.error(locale === 'zh' ? '登录失败，请检查验证码' : 'Login failed, please check verification code', {
+        style: {
+          background: '#333',
+          color: '#fff',
+          border: '1px solid #555'
+        }
+      });
     } finally {
       setIsLoggingIn(false);
     }
@@ -105,10 +129,22 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   const handleLogout = async () => {
     try {
       await logout();
-      toast.success(locale === 'zh' ? '已退出登录' : 'Logged out successfully');
+      toast.success(locale === 'zh' ? '已退出登录' : 'Logged out successfully', {
+        style: {
+          background: '#333',
+          color: '#fff',
+          border: '1px solid #555'
+        }
+      });
     } catch (error) {
       console.error('Logout error:', error);
-      toast.error(locale === 'zh' ? '退出登录失败' : 'Logout failed');
+      toast.error(locale === 'zh' ? '退出登录失败' : 'Logout failed', {
+        style: {
+          background: '#333',
+          color: '#fff',
+          border: '1px solid #555'
+        }
+      });
     }
   };
 
@@ -128,7 +164,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
       localStorage.setItem('customAPIKey', customAPIKey);
       localStorage.setItem('customAPIBase', customAPIBase);
       localStorage.setItem('customModel', customModel);
-      toast.success(locale === 'zh' ? 'API配置已保存' : 'API configuration saved');
+      toast.success(locale === 'zh' ? 'API配置已保存' : 'API configuration saved', {
+        style: {
+          background: '#333',
+          color: '#fff',
+          border: '1px solid #555'
+        }
+      });
     }
   };
 
@@ -158,7 +200,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    toast.success(locale === 'zh' ? '配置已导出' : 'Settings exported');
+    toast.success(locale === 'zh' ? '配置已导出' : 'Settings exported', {
+        style: {
+          background: '#333',
+          color: '#fff',
+          border: '1px solid #555'
+        }
+      });
   };
 
   // 导入配置
@@ -173,7 +221,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
 
         // 验证配置文件格式
         if (!settings.version) {
-          toast.error(locale === 'zh' ? '无效的配置文件' : 'Invalid settings file');
+          toast.error(locale === 'zh' ? '无效的配置文件' : 'Invalid settings file', {
+        style: {
+          background: '#333',
+          color: '#fff',
+          border: '1px solid #555'
+        }
+      });
           return;
         }
 
@@ -197,9 +251,21 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
           localStorage.setItem('customModel', settings.customModel || 'gpt-3.5-turbo');
         }
 
-        toast.success(locale === 'zh' ? '配置已导入' : 'Settings imported');
+        toast.success(locale === 'zh' ? '配置已导入' : 'Settings imported', {
+        style: {
+          background: '#333',
+          color: '#fff',
+          border: '1px solid #555'
+        }
+      });
       } catch (error) {
-        toast.error(locale === 'zh' ? '导入失败，请检查文件格式' : 'Import failed, please check file format');
+        toast.error(locale === 'zh' ? '导入失败，请检查文件格式' : 'Import failed, please check file format', {
+        style: {
+          background: '#333',
+          color: '#fff',
+          border: '1px solid #555'
+        }
+      });
       }
     };
     reader.readAsText(file);
@@ -270,7 +336,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${activeTab === tab.id
-                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
+                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                     }`}
                 >
@@ -296,7 +362,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                         key={option.value}
                         onClick={() => setTheme(option.value as any)}
                         className={`p-4 rounded-lg border-2 transition-all ${theme === option.value
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900'
+                          ? 'border-gray-500 bg-gray-50 dark:bg-gray-700'
                           : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                           }`}
                       >
@@ -319,7 +385,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                         key={option.value}
                         onClick={() => setFontSize(option.value as any)}
                         className={`p-3 rounded-lg border-2 transition-all ${fontSize === option.value
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900'
+                          ? 'border-gray-500 bg-gray-50 dark:bg-gray-700'
                           : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                           }`}
                       >
@@ -343,7 +409,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                         key={option.value}
                         onClick={() => setFontFamily(option.value as any)}
                         className={`w-full p-3 rounded-lg border-2 text-left transition-all ${fontFamily === option.value
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900'
+                          ? 'border-gray-500 bg-gray-50 dark:bg-gray-700'
                           : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                           }`}
                       >
@@ -379,7 +445,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                         key={option.value}
                         onClick={() => setLocale(option.value as any)}
                         className={`p-4 rounded-lg border-2 transition-all ${locale === option.value
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900'
+                          ? 'border-gray-500 bg-gray-50 dark:bg-gray-700'
                           : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                           }`}
                       >
@@ -549,7 +615,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                       <button
                         onClick={saveAPIConfig}
                         disabled={!useCustomAPI}
-                        className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {locale === 'zh' ? '保存API配置' : 'Save API Configuration'}
                       </button>
@@ -607,7 +673,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                           <button
                             onClick={handleRequestCode}
                             disabled={isRequestingCode}
-                            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+                            className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
                           >
                             {isRequestingCode
                               ? (locale === 'zh' ? '生成中...' : 'Generating...')
@@ -626,7 +692,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                             <button
                               onClick={handleLogin}
                               disabled={isLoggingIn || !verificationCode.trim()}
-                              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+                              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
                             >
                               {isLoggingIn
                                 ? (locale === 'zh' ? '登录中...' : 'Logging in...')
@@ -670,7 +736,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <button
                         onClick={exportSettings}
-                        className="flex items-center justify-center space-x-3 p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        className="flex items-center justify-center space-x-3 p-4 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
                       >
                         <ArrowDownTrayIcon className="w-5 h-5" />
                         <div className="text-left">
@@ -679,7 +745,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                         </div>
                       </button>
 
-                      <label className="flex items-center justify-center space-x-3 p-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors cursor-pointer">
+                      <label className="flex items-center justify-center space-x-3 p-4 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors cursor-pointer">
                         <ArrowUpTrayIcon className="w-5 h-5" />
                         <div className="text-left">
                           <div className="font-medium">{locale === 'zh' ? '导入配置' : 'Import Settings'}</div>
@@ -753,7 +819,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
         <div className="flex items-center justify-end p-6 border-t border-gray-200 dark:border-gray-700">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
           >
             {locale === 'zh' ? '完成' : 'Done'}
           </button>

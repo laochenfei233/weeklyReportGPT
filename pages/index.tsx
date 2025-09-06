@@ -243,13 +243,21 @@ const Home: NextPage = () => {
 
         {/* 管理员状态显示 */}
         {user && (
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200 max-w-xl">
+          <div className={`mt-6 p-4 rounded-lg border max-w-xl ${
+            theme === 'dark' 
+              ? 'bg-gray-800 border-gray-700' 
+              : 'bg-gray-100 border-gray-300'
+          }`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-blue-800">
+                <p className={`text-sm ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-800'
+                }`}>
                   {locale === 'zh' ? '欢迎回来，管理员' : 'Welcome back, Administrator'}
                 </p>
-                <p className="text-xs text-green-600 mt-1">
+                <p className={`text-xs mt-1 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>
                   {locale === 'zh' ? '✅ 管理员账户，无Token限制' : '✅ Administrator account, unlimited tokens'}
                 </p>
               </div>
@@ -403,7 +411,26 @@ const Home: NextPage = () => {
         <Toaster
           position="top-center"
           reverseOrder={false}
-          toastOptions={{ duration: 2000 }}
+          toastOptions={{
+            duration: 2000,
+            style: {
+              background: '#333',
+              color: '#fff',
+              border: '1px solid #555'
+            },
+            success: {
+              iconTheme: {
+                primary: '#ddd',
+                secondary: '#333'
+              }
+            },
+            error: {
+              iconTheme: {
+                primary: '#ddd',
+                secondary: '#333'
+              }
+            }
+          }}
         />
         <hr className="h-px bg-gray-700 border-1 dark:bg-gray-700" />
         <ResizablePanel>

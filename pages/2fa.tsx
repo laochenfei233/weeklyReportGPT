@@ -3,62 +3,62 @@ import Head from 'next/head'
 import { motion } from 'framer-motion'
 import { Enable2FA } from '../components/admin/Enable2FA'
 import { Verify2FA } from '../components/admin/Verify2FA'
-import Header from '../components/Header'
-import Footer from '../components/Footer'
-import { useAuthState } from '../hooks/useAuth'
+import { useTheme } from '../contexts/ThemeContext'
+import styles from '../styles/admin-2fa.module.css'
 
 export default function TwoFAPage() {
-  const { user } = useAuthState()
-  const [adminId] = useState(user?.email || 'admin@example.com')
+  const { theme } = useTheme()
+  const [adminId] = useState('admin@example.com')
   const [mode, setMode] = useState<'setup' | 'verify'>('setup')
-  const [ipAddress] = useState('192.168.1.1') // 实际使用中应从请求获取
 
   return (
-    <div className="flex max-w-5xl mx-auto flex-col items-center justify-center py-2 min-h-screen">
+    <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <Head>
-        <title>双重验证设置</title>
+        <title>双重验证设置 - Weekly Report GPT</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Header />
-      
-      <main className="flex flex-1 w-full flex-col items-center justify-center text-center px-4 mt-12 sm:mt-20">
+      <main className="max-w-md mx-auto py-12 px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="max-w-xl w-full"
+          className={`p-8 rounded-xl ${
+            theme === 'dark' 
+              ? 'bg-gray-800 border-gray-700' 
+              : 'bg-white border-gray-200'
+          } border shadow-md`}
         >
-          <h1 className="sm:text-4xl text-3xl font-bold text-slate-900 mb-6">
+          <h1 className={`text-2xl font-bold mb-8 text-center ${
+            theme === 'dark' ? 'text-white' : 'text-gray-800'
+          }`}>
             双重验证设置
           </h1>
           
           {mode === 'setup' ? (
-            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+            <>
               <Enable2FA adminId={adminId} />
               <button 
-                className="mt-6 w-full bg-black text-white font-medium py-2 px-4 rounded-md hover:bg-gray-800 transition-colors"
+                className={`${styles.button} ${
+                  theme === 'dark' 
+                    ? 'bg-blue-600 hover:bg-blue-700' 
+                    : 'bg-blue-500 hover:bg-blue-600'
+                }`}
                 onClick={() => setMode('verify')}
               >
                 我已设置2FA，现在测试验证
               </button>
-            </div>
+            </>
           ) : (
-            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-              <Verify2FA 
-                adminId={adminId}
-                ipAddress={ipAddress}
-                onSuccess={(is2FAVerified) => {
-                  alert(is2FAVerified ? '2FA验证成功' : '验证码验证成功')
-                  setMode('setup')
-                }}
-              />
-            </div>
+            <Verify2FA 
+              adminId={adminId}
+              onSuccess={(is2FAVerified) => {
+                alert(is2FAVerified ? '2FA验证成功' : '验证码验证成功')
+                setMode('setup')
+              }}
+            />
           )}
         </motion.div>
       </main>
-
-      <Footer />
     </div>
   )
 }

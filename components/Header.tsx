@@ -24,7 +24,7 @@ export default function Header({ onSettingsClick }: HeaderProps) {
           height={32}
         />
         <h1 className="sm:text-4xl text-2xl font-bold ml-2 tracking-tight">
-          {t('title')}
+          周报生成器
         </h1>
       </Link>
       <div className="flex items-center gap-4">
