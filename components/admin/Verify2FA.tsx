@@ -168,9 +168,6 @@ export const Verify2FA = ({
           </motion.p>
         )}
       </AnimatePresence>
-      </AnimatePresence>
     </div>
   )
-}
-}
 }

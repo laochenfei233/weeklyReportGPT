@@ -177,42 +177,43 @@ export default function Debug() {
                         : 'border-gray-200'
                     }`}
                   >
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className={`font-medium ${
-                      theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
-                    }`}>
-                      {getStatusIcon(result.status)} {result.test}
-                    </h3>
-                    <span className={`text-sm font-medium ${getStatusColor(result.status)}`}>
-                      {result.status === 'loading' ? '测试中' : 
-                       result.status === 'success' ? '通过' : '失败'}
-                    </span>
-                  </div>
-                  
-                  <p className={`text-sm ${getStatusColor(result.status)} mb-2`}>
-                    {result.message}
-                  </p>
-                  
-                  {result.details && (
-                    <details className={`text-xs ${
-                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                    }`}>
-                      <summary className={`cursor-pointer ${
-                        theme === 'dark' ? 'hover:text-gray-300' : 'hover:text-gray-800'
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className={`font-medium ${
+                        theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
                       }`}>
-                        查看详细信息
-                      </summary>
-                      <pre className={`mt-2 p-2 rounded overflow-auto ${
-                        theme === 'dark' 
-                          ? 'bg-gray-700 text-gray-200' 
-                          : 'bg-gray-100'
+                        {getStatusIcon(result.status)} {result.test}
+                      </h3>
+                      <span className={`text-sm font-medium ${getStatusColor(result.status)}`}>
+                        {result.status === 'loading' ? '测试中' : 
+                         result.status === 'success' ? '通过' : '失败'}
+                      </span>
+                    </div>
+                    
+                    <p className={`text-sm ${getStatusColor(result.status)} mb-2`}>
+                      {result.message}
+                    </p>
+                    
+                    {result.details && (
+                      <details className={`text-xs ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                       }`}>
-                        {JSON.stringify(result.details, null, 2)}
-                      </pre>
-                    </details>
-                  )}
-                </motion.div>
-              ))}
+                        <summary className={`cursor-pointer ${
+                          theme === 'dark' ? 'hover:text-gray-300' : 'hover:text-gray-800'
+                        }`}>
+                          查看详细信息
+                        </summary>
+                        <pre className={`mt-2 p-2 rounded overflow-auto ${
+                          theme === 'dark' 
+                            ? 'bg-gray-700 text-gray-200' 
+                            : 'bg-gray-100'
+                        }`}>
+                          {JSON.stringify(result.details, null, 2)}
+                        </pre>
+                      </details>
+                    )}
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </div>
           )}
 
