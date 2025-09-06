@@ -18,20 +18,23 @@
 
 .inputField {
   width: 100%;
-  padding: 10px;
-  margin: 10px 0;
+  padding: 12px;
+  margin: 15px 0;
   border: 1px solid #ddd;
   border-radius: 4px;
+  font-size: 16px;
 }
 
 .button {
   background-color: #4CAF50;
   color: white;
-  padding: 10px 15px;
+  padding: 12px 20px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  margin-right: 10px;
+  margin: 20px 10px 0 0;
+  font-size: 16px;
+  transition: background-color 0.3s;
 }
 
 .button:hover {

@@ -162,7 +162,9 @@ export default function Debug() {
 
           {results.length > 0 && (
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-gray-800">测试结果</h2>
+              <h2 className={`text-lg font-semibold ${
+                theme === 'dark' ? 'text-gray-100' : 'text-gray-800'
+              }`}>测试结果</h2>
               
               <AnimatePresence>
                 {results.map((result, index) => (
@@ -232,6 +234,11 @@ export default function Debug() {
               <li>• API连接测试：测试与OpenAI API的连接状态</li>
               <li>• 周报生成测试：验证核心功能是否正常工作</li>
             </ul>
+            <p className={`mt-2 text-xs ${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            }`}>
+              注意：所有测试结果仅保存在当前会话中，刷新页面后将清空
+            </p>
           </div>
         </div>
       </div>
