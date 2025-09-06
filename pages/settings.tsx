@@ -4,6 +4,7 @@ import Header from '../components/Header';
 import { toast } from 'react-hot-toast';
 import { API_PROVIDERS, validateAPIKey, getAPIKeyInfo } from '../utils/apiConfig';
 import { useAuthState } from '../hooks/useAuth';
+import { useTranslations } from 'next-intl';
 
 interface UserSettings {
   useCustomConfig: boolean;
@@ -14,6 +15,7 @@ interface UserSettings {
 
 export default function Settings() {
   const { user, isLoading: authLoading } = useAuthState();
+  const t = useTranslations('Settings');
   const [settings, setSettings] = useState<UserSettings>({
     useCustomConfig: false,
     customApiKey: '',
@@ -66,7 +68,7 @@ export default function Settings() {
         const isValid = validateAPIKey(settings.customApiKey, settings.customApiBase);
         if (!isValid) {
           const keyInfo = getAPIKeyInfo(settings.customApiKey, settings.customApiBase);
-          toast.error(`API密钥格式不正确。${keyInfo.format}`);
+          toast.error(`${t('keyFormatError')}${keyInfo.format}`);
           setIsLoading(false);
           return;
         }
@@ -74,10 +76,10 @@ export default function Settings() {
 
       // 保存到localStorage
       localStorage.setItem('userSettings', JSON.stringify(settings));
-      toast.success('设置已保存');
+      toast.success(t('settingsSaved'));
     } catch (error) {
       console.error('Save settings error:', error);
-      toast.error('保存设置失败');
+      toast.error(t('settingsSaveError'));
     } finally {
       setIsLoading(false);
     }
@@ -92,7 +94,7 @@ export default function Settings() {
     });
     setSelectedProvider('openai');
     localStorage.removeItem('userSettings');
-    toast.success('设置已重置');
+    toast.success(t('settingsResetSuccess'));
   };
 
   if (authLoading) {
@@ -106,7 +108,7 @@ export default function Settings() {
   return (
     <div className="flex max-w-5xl mx-auto flex-col items-center justify-center py-2 min-h-screen">
       <Head>
-        <title>设置 - Weekly Report GPT</title>
+        <title>{t('title')}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -114,19 +116,19 @@ export default function Settings() {
 
       <main className="flex flex-1 w-full flex-col items-center justify-center text-center px-4 mt-12 sm:mt-20">
         <div className="max-w-2xl w-full">
-          <h1 className="text-4xl font-bold mb-8">API 设置</h1>
+          <h1 className="text-4xl font-bold mb-8">{t('pageTitle')}</h1>
           
           {/* 用户状态显示 */}
           {user && (
             <div className="mb-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
               <p className="text-sm text-blue-800">
-                当前用户: {user.email}
-                {user.isAdmin && <span className="ml-2 px-2 py-1 bg-blue-600 text-white text-xs rounded">管理员</span>}
+                {t('currentUser')}: {user.email}
+                {user.isAdmin && <span className="ml-2 px-2 py-1 bg-blue-600 text-white text-xs rounded">{t('admin')}</span>}
               </p>
               {user.isAdmin ? (
-                <p className="text-xs text-green-600 mt-1">✅ 管理员账户，无token使用限制</p>
+                <p className="text-xs text-green-600 mt-1">{t('adminNoLimit')}</p>
               ) : (
-                <p className="text-xs text-orange-600 mt-1">⚠️ 普通用户，每日限制10,000 tokens（除非使用自定义API）</p>
+                <p className="text-xs text-orange-600 mt-1">{t('userLimit')}</p>
               )}
             </div>
           )}
@@ -141,10 +143,10 @@ export default function Settings() {
                   onChange={(e) => setSettings(prev => ({ ...prev, useCustomConfig: e.target.checked }))}
                   className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
-                <span className="text-lg font-medium">使用自定义 API 配置</span>
+                <span className="text-lg font-medium">{t('useCustomConfig')}</span>
               </label>
               <p className="text-sm text-gray-600 mt-2">
-                启用后将使用您自己的API密钥，不受每日token限制
+                {t('useCustomConfigDesc')}
               </p>
             </div>
 
@@ -153,7 +155,7 @@ export default function Settings() {
                 {/* API提供商选择 */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    API 提供商
+                    {t('apiProvider')}
                   </label>
                   <select
                     value={selectedProvider}
@@ -171,7 +173,7 @@ export default function Settings() {
                 {/* API Base URL */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    API Base URL
+                    {t('apiBaseUrl')}
                   </label>
                   <input
                     type="url"
@@ -185,7 +187,7 @@ export default function Settings() {
                 {/* API Key */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    API Key
+                    {t('apiKey')}
                   </label>
                   <div className="relative">
                     <input
@@ -218,9 +220,9 @@ export default function Settings() {
                         const keyInfo = getAPIKeyInfo(settings.customApiKey, settings.customApiBase);
                         return (
                           <p className={`text-xs ${keyInfo.isValid ? 'text-green-600' : 'text-red-600'}`}>
-                            {keyInfo.isValid ? '✅ API密钥格式正确' : '❌ API密钥格式不正确'}
+                            {keyInfo.isValid ? t('keyFormatCorrect') : t('keyFormatIncorrect')}
                             <br />
-                            提供商: {keyInfo.provider}
+                            {t('provider')}: {keyInfo.provider}
                           </p>
                         );
                       })()}
@@ -231,7 +233,7 @@ export default function Settings() {
                 {/* Model */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    模型
+                    {t('model')}
                   </label>
                   <select
                     value={settings.customModel}
@@ -253,26 +255,26 @@ export default function Settings() {
                 disabled={isLoading}
                 className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? '保存中...' : '保存设置'}
+                {isLoading ? t('savingSettings') : t('saveSettings')}
               </button>
               <button
                 onClick={handleReset}
                 className="flex-1 bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700"
               >
-                重置设置
+                {t('resetSettings')}
               </button>
             </div>
           </div>
 
           {/* 说明信息 */}
           <div className="mt-8 p-4 bg-gray-50 rounded-lg text-sm text-gray-600">
-            <h3 className="font-medium mb-2">使用说明：</h3>
+            <h3 className="font-medium mb-2">{t('instructions')}</h3>
             <ul className="space-y-1 text-left">
-              <li>• 管理员账户无token使用限制</li>
-              <li>• 普通用户每日限制10,000 tokens</li>
-              <li>• 配置自定义API后可绕过token限制</li>
-              <li>• 支持 OpenAI、DeepSeek、Moonshot、智谱AI 等多个提供商</li>
-              <li>• 设置保存在浏览器本地，不会上传到服务器</li>
+              <li>• {t('instructionsList.adminNoLimit')}</li>
+              <li>• {t('instructionsList.userLimit')}</li>
+              <li>• {t('instructionsList.customApi')}</li>
+              <li>• {t('instructionsList.providers')}</li>
+              <li>• {t('instructionsList.localSettings')}</li>
             </ul>
           </div>
         </div>

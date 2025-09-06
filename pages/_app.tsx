@@ -4,18 +4,25 @@ import { IntlProvider } from 'next-intl'
 import "../styles/globals.css";
 import "../styles/markdown.css";
 import { SettingsProvider } from '../contexts/SettingsContext';
+import { ThemeProvider } from '../contexts/ThemeContext';
 
 function MyApp({ Component, pageProps }: AppProps) {
+  // 确保messages和locale存在
+  const messages = pageProps.messages || {};
+  const locale = pageProps.locale || 'en';
+  
   return (
     <SettingsProvider>
-      <IntlProvider
-        messages={pageProps.messages}
-        locale={pageProps.locale || 'en'}
-        timeZone="Asia/Shanghai"
-        >
-        <Component {...pageProps} />
-        <Analytics />
-      </IntlProvider>
+      <ThemeProvider>
+        <IntlProvider
+          messages={messages}
+          locale={locale}
+          timeZone="Asia/Shanghai"
+          >
+          <Component {...pageProps} />
+          <Analytics />
+        </IntlProvider>
+      </ThemeProvider>
     </SettingsProvider>
   );
 }

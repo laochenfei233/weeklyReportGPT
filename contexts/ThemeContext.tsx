@@ -8,13 +8,22 @@ interface ThemeContextType {
   toggleTheme: () => void;
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+// 默认值，防止服务器端渲染时出错
+const defaultContextValue: ThemeContextType = {
+  theme: 'light',
+  setTheme: () => {},
+  toggleTheme: () => {}
+};
+
+const ThemeContext = createContext<ThemeContextType>(defaultContextValue);
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setTheme] = useState<Theme>('light');
+  const [isMounted, setIsMounted] = useState(false);
 
-  // 初始化主题，优先使用本地存储的主题设置
+  // 客户端挂载后初始化
   useEffect(() => {
+    setIsMounted(true);
     const savedTheme = localStorage.getItem('theme') as Theme | null;
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     
@@ -27,10 +36,12 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
   // 当主题变化时，更新文档类和本地存储
   useEffect(() => {
-    document.documentElement.classList.remove('light', 'dark');
-    document.documentElement.classList.add(theme);
-    localStorage.setItem('theme', theme);
-  }, [theme]);
+    if (isMounted) {
+      document.documentElement.classList.remove('light', 'dark');
+      document.documentElement.classList.add(theme);
+      localStorage.setItem('theme', theme);
+    }
+  }, [theme, isMounted]);
 
   // 切换主题
   const toggleTheme = () => {
@@ -47,8 +58,5 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 // 自定义Hook，方便在组件中使用主题
 export const useTheme = () => {
   const context = useContext(ThemeContext);
-  if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
   return context;
 };

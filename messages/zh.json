@@ -26,5 +26,37 @@
     "notice":"因此网站的使用人数以不可思议的速度飙升，作者无力承担随之而来的运营成本，故决定此网站将在2023-02-15 00:00:00永久下线。有任何问题请通过GitHub上的邮箱联系",
     "API_KEY_NULL_ERROR": "API key不能为空",
     "CONTENT_NULL_ERROR": "工作内容不能为空"
+  },
+  "Settings": {
+    "title": "设置 - Weekly Report GPT",
+    "pageTitle": "API 设置",
+    "currentUser": "当前用户",
+    "admin": "管理员",
+    "adminNoLimit": "✅ 管理员账户，无token使用限制",
+    "userLimit": "⚠️ 普通用户，每日限制10,000 tokens（除非使用自定义API）",
+    "useCustomConfig": "使用自定义 API 配置",
+    "useCustomConfigDesc": "启用后将使用您自己的API密钥，不受每日token限制",
+    "apiProvider": "API 提供商",
+    "apiBaseUrl": "API Base URL",
+    "apiKey": "API Key",
+    "model": "模型",
+    "saveSettings": "保存设置",
+    "savingSettings": "保存中...",
+    "resetSettings": "重置设置",
+    "instructions": "使用说明：",
+    "instructionsList": {
+      "adminNoLimit": "• 管理员账户无token使用限制",
+      "userLimit": "• 普通用户每日限制10,000 tokens",
+      "customApi": "• 配置自定义API后可绕过token限制",
+      "providers": "• 支持 OpenAI、DeepSeek、Moonshot、智谱AI 等多个提供商",
+      "localSettings": "• 设置保存在浏览器本地，不会上传到服务器"
+    },
+    "keyFormatError": "API密钥格式不正确。",
+    "settingsSaved": "设置已保存",
+    "settingsResetSuccess": "设置已重置",
+    "settingsSaveError": "保存设置失败",
+    "keyFormatCorrect": "✅ API密钥格式正确",
+    "keyFormatIncorrect": "❌ API密钥格式不正确",
+    "provider": "提供商"
   }
 }

@@ -26,5 +26,37 @@
     "notice": "Due to the incredible surge in website usage, the author cannot afford the resulting operational costs, so this website will be permanently offline at 2023-02-15 00:00:00. For any questions, please contact via email on GitHub",
     "API_KEY_NULL_ERROR": "API key cannot be empty",
     "CONTENT_NULL_ERROR": "Work content cannot be empty"
+  },
+  "Settings": {
+    "title": "Settings - Weekly Report GPT",
+    "pageTitle": "API Settings",
+    "currentUser": "Current User",
+    "admin": "Admin",
+    "adminNoLimit": "✅ Admin account, no token usage limit",
+    "userLimit": "⚠️ Regular user, limited to 10,000 tokens per day (unless using custom API)",
+    "useCustomConfig": "Use Custom API Configuration",
+    "useCustomConfigDesc": "When enabled, your own API key will be used, without daily token limits",
+    "apiProvider": "API Provider",
+    "apiBaseUrl": "API Base URL",
+    "apiKey": "API Key",
+    "model": "Model",
+    "saveSettings": "Save Settings",
+    "savingSettings": "Saving...",
+    "resetSettings": "Reset Settings",
+    "instructions": "Instructions:",
+    "instructionsList": {
+      "adminNoLimit": "• Admin accounts have no token usage limit",
+      "userLimit": "• Regular users are limited to 10,000 tokens per day",
+      "customApi": "• Configure custom API to bypass token limits",
+      "providers": "• Supports OpenAI, DeepSeek, Moonshot, Zhipu AI and other providers",
+      "localSettings": "• Settings are saved locally in your browser, not uploaded to the server"
+    },
+    "keyFormatError": "API key format is incorrect.",
+    "settingsSaved": "Settings saved",
+    "settingsResetSuccess": "Settings reset",
+    "settingsSaveError": "Failed to save settings",
+    "keyFormatCorrect": "✅ API key format is correct",
+    "keyFormatIncorrect": "❌ API key format is incorrect",
+    "provider": "Provider"
   }
 }

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Head from 'next/head';
 import { toast, Toaster } from 'react-hot-toast';
-import { useTheme } from '../../contexts/ThemeContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface TestResult {
