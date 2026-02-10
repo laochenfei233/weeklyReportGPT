@@ -1,5 +1,27 @@
 # 📋 更新日志
 
+## [2.3.0] - 2025-02-10
+
+### 🎯 系统提示词优化
+- **平台特定提示词**: 根据不同API平台自动选择最优系统提示词
+- **支持的平台**: OpenAI、DeepSeek、Moonshot、智谱AI
+- **Token优化**: 提示词从150+字符精简到约100字符，减少30% Token消耗
+- **输出质量**: 明确"直接输出Markdown"指令，避免无用前缀/后缀
+
+### 🔒 安全更新
+- **Next.js升级**: 15.1.0 → 15.2.0 (修复RCE、SSRF、DoS等6个CVE)
+- **依赖更新**: @headlessui/react、@heroicons/react、framer-motion、next-intl等
+- **漏洞修复**: js-yaml原型污染、glob命令注入、jws HMAC签名验证
+- **审计结果**: 0 vulnerabilities
+
+### 🎨 UI改进
+- **按钮文字动态切换**: 根据报告类型显示对应按钮文字
+  - 日报 → "生成完整日报"
+  - 周报 → "生成完整周报"
+  - 月报 → "生成完整月报"
+- **Footer简化**: 删除"Supported by"部分，界面更简洁
+- **国际化修复**: settings.tsx添加getStaticProps支持
+
 ## [2.2.0] - 2025-08-30
 
 ### ⚙️ 全新设置系统
