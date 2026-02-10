@@ -117,7 +117,7 @@ export default function Settings() {
       <main className="flex flex-1 w-full flex-col items-center justify-center text-center px-4 mt-12 sm:mt-20">
         <div className="max-w-2xl w-full">
           <h1 className="text-4xl font-bold mb-8">{t('pageTitle')}</h1>
-          
+           
           {/* 用户状态显示 */}
           {user && (
             <div className="mb-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
@@ -281,4 +281,14 @@ export default function Settings() {
       </main>
     </div>
   );
+}
+
+export function getStaticProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      messages: {
+        ...require(`../messages/${locale}.json`),
+      },
+    },
+  };
 }
