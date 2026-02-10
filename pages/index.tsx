@@ -377,7 +377,7 @@ const Home: NextPage = () => {
               }`}
               onClick={(e) => generateChat(e)}
             >
-              {t('simplifierButton')} &rarr;
+              {reportType === 'daily' ? '生成完整日报' : reportType === 'weekly' ? '生成完整周报' : '生成完整月报'} →
             </button>
           )}
           {loading && (
