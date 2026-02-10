@@ -141,7 +141,28 @@ export default function QuickDebug() {
         <title>快速诊断 - 服务器繁忙问题</title>
       </Head>
 
-      <Toaster position="top-center" />
+      <Toaster 
+        position="top-center"
+        toastOptions={{
+          style: {
+            background: '#333',
+            color: '#fff',
+            border: '1px solid #555'
+          },
+          success: {
+            iconTheme: {
+              primary: '#ddd',
+              secondary: '#333'
+            }
+          },
+          error: {
+            iconTheme: {
+              primary: '#ddd',
+              secondary: '#333'
+            }
+          }
+        }}
+      />
 
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">快速诊断工具</h1>

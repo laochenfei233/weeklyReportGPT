@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { OpenAIStream, OpenAIStreamPayload } from "../../utils/OpenAIStream";
+import { getEffectiveSystemPrompt } from "../../utils/apiConfig";
 
 // Vercel函数配置 - 免费计划限制
 export const config = {
@@ -60,24 +61,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
+    // 确定API Base URL
+    const effectiveApiBase = customConfig?.apiBase || 
+      process.env.OPENAI_API_BASE || 
+      "https://api.openai.com/v1";
+    
+    // 获取基础系统提示词
+    const baseSystemPrompt = getEffectiveSystemPrompt(effectiveApiBase);
+    
     // 根据分块调整提示词
-    let systemPrompt = "你是一个专业的周报生成助手。";
+    let systemPrompt = baseSystemPrompt;
     let adjustedPrompt = prompt;
     
     if (totalChunks > 1) {
+      // 分块模式：添加部分特定的指令
       if (chunkIndex === 0) {
-        systemPrompt += "请生成周报的开头部分，包括标题和本周工作总结。";
-        adjustedPrompt = `请为以下工作内容生成周报的开头部分（标题和工作总结）：\n\n${prompt}`;
+        adjustedPrompt = `请为以下工作内容生成周报开头（标题+工作总结）：\n\n${prompt}`;
       } else if (chunkIndex === totalChunks - 1) {
-        systemPrompt += "请生成周报的结尾部分，包括下周计划和总结。";
-        adjustedPrompt = `请为以下工作内容生成周报的结尾部分（下周计划和总结）：\n\n${prompt}`;
+        adjustedPrompt = `请为以下工作内容生成周报结尾（计划+总结）：\n\n${prompt}`;
       } else {
-        systemPrompt += `请生成周报的第${chunkIndex + 1}部分内容。`;
-        adjustedPrompt = `请为以下工作内容生成周报的第${chunkIndex + 1}部分：\n\n${prompt}`;
+        adjustedPrompt = `请为以下工作内容生成周报第${chunkIndex + 1}部分：\n\n${prompt}`;
       }
-    } else {
-      systemPrompt += "请帮我把以下的工作内容填充为一篇完整的周报，请直接用markdown格式以分点叙述的形式输出，内容要专业、详细且条理清晰。";
-    }
+    } 
+    
+    console.log(`Chunk ${chunkIndex}/${totalChunks} - 平台: ${effectiveApiBase.includes('deepseek') ? 'DeepSeek' : effectiveApiBase.includes('moonshot') ? 'Moonshot' : effectiveApiBase.includes('bigmodel') ? 'Zhipu' : 'OpenAI/Custom'}`);
     
     const payload: OpenAIStreamPayload = {
       model: model || customConfig?.model || process.env.OPENAI_MODEL || "gpt-3.5-turbo",

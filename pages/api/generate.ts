@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { OpenAIStream, OpenAIStreamPayload } from "../../utils/OpenAIStream";
+import { detectProvider, getEffectiveSystemPrompt } from "../../utils/apiConfig";
 
 // Vercel函数配置 - 免费计划限制
 export const config = {
@@ -69,13 +70,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.log('使用系统配置的API密钥');
     }
 
-    // System prompt for weekly report generation
-    const systemPrompt = "你是一个专业的周报生成助手。请帮我把以下的工作内容填充为一篇完整的周报，请直接用markdown格式以分点叙述的形式输出，内容要专业、详细且条理清晰。";
+    // 确定API Base URL
+    const effectiveApiBase = customConfig?.apiBase || 
+      process.env.OPENAI_API_BASE || 
+      "https://api.openai.com/v1";
+    
+    // 根据平台获取系统提示词
+    const effectiveSystemPrompt = getEffectiveSystemPrompt(
+      effectiveApiBase,
+      process.env.CUSTOM_SYSTEM_PROMPT // 可选的自定义环境变量
+    );
+    
+    console.log(`使用的平台: ${detectProvider(effectiveApiBase)?.name || 'Custom'}`);
+    console.log(`系统提示词长度: ${effectiveSystemPrompt.length} 字符`);
     
     const payload: OpenAIStreamPayload = {
       model: model || customConfig?.model || process.env.OPENAI_MODEL || "gpt-3.5-turbo",
       messages: [
-        { role: "system", content: systemPrompt },
+        { role: "system", content: effectiveSystemPrompt },
         { role: "user", content: prompt }
       ],
       temperature,
