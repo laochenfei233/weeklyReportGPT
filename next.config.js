@@ -6,6 +6,15 @@ const nextConfig = {
     defaultLocale: 'zh',
   },
 
+  // 静态导出配置（用于GitHub Pages和Cloudflare Pages）
+  output: 'export',
+  images: {
+    unoptimized: true,
+  },
+
+  // 禁用不需要的Next.js功能以支持静态导出
+  trailingSlash: true,
+  
   serverExternalPackages: [],
   env: {
     OPENAI_API_BASE: process.env.OPENAI_API_BASE,

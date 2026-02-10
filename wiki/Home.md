@@ -7,6 +7,8 @@
 ### 🚀 快速开始
 - [部署指南](Deployment-Guide) - 完整的部署说明和配置
 - [Vercel 部署](Vercel-Deployment) - 专门的 Vercel 平台部署指南
+- [Cloudflare Pages 部署](Cloudflare-Pages-Deployment) - Cloudflare Pages 部署指南
+- [GitHub Pages 部署](GitHub-Pages-Deployment) - GitHub Pages 部署指南
 - [环境配置](Environment-Configuration) - 环境变量详细说明
 
 ### 🔧 功能指南
@@ -32,7 +34,7 @@
 
 - **🎨 个性化设置**: 支持主题、字体、语言等个性化配置
 - **🔄 多 API 源**: 支持 OpenAI、DeepSeek、Moonshot、智谱AI 等
-- **🚀 一键部署**: 支持 Vercel 等平台的一键部署
+- **🚀 多平台部署**: 支持 Vercel、Cloudflare Pages、GitHub Pages 一键部署
 - **🛡️ 安全可靠**: 完善的隐私保护机制
 - **📱 响应式设计**: 适配桌面、平板、手机等设备
 

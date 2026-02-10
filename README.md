@@ -11,7 +11,7 @@
 - 🎨 **个性化设置**: 字体、主题、语言等自定义配置
 - 🔄 **多API源支持**: OpenAI、DeepSeek、Moonshot、智谱AI 等
 - 📅 **多种报告类型**: 支持日报、周报、月报一键切换
-- 🚀 **一键部署**: 完美支持 Vercel 部署
+- 🚀 **多平台部署**: 支持 Vercel、Cloudflare Pages、GitHub Pages 一键部署
 - 🔧 **调试工具**: 内置系统诊断和健康检查
 - 🛡️ **隐私保护**: 数据不存储，支持自定义API密钥
 
@@ -45,19 +45,61 @@ NEXT_PUBLIC_USE_USER_KEY=false
 
 📋 **详细配置**: 查看 [环境配置指南](../../wiki/Environment-Configuration)
 
-## ☁️ 部署到 Vercel
+## ☁️ 部署指南
 
-### 一键部署
+### 🚀 一键部署到云平台
+
+| 平台 | 一键部署 | 特点 |
+|------|----------|------|
+| **Vercel** | [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/laochenfei233/weeklyReportGPT&env=OPENAI_API_KEY,NEXT_PUBLIC_USE_USER_KEY&project-name=weeklyReportGPT&repo-name=weeklyReportGPT) | 官方推荐，自动部署，免费额度充足 |
+| **Cloudflare Pages** | [![Deploy to Cloudflare Pages](https://deploy.pages.dev.svg)](https://deploy.pages.dev/button/github/laochenfei233/weeklyReportGPT) | 全球CDN，免费无限流量 |
+| **GitHub Pages** | 手动部署 | 免费静态托管，适合个人项目 |
+
+### 📋 部署方式对比
+
+| 特性 | Vercel | Cloudflare Pages | GitHub Pages |
+|------|--------|------------------|--------------|
+| 免费额度 | 有限 | 无限 | 无限 |
+| 全球CDN | ✅ | ✅ | ✅ |
+| 自动部署 | ✅ | ✅ | ✅ |
+| 无服务器API | ❌ | ❌ | ❌ |
+| 客户端API调用 | ✅ | ✅ | ✅ |
+
+> **注意**: Cloudflare Pages 和 GitHub Pages 部署使用客户端API调用模式，需要用户在使用时输入自己的API密钥。
+
+### 🔧 各平台部署
+
+#### Vercel 部署（推荐）
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/laochenfei233/weeklyReportGPT&env=OPENAI_API_KEY,NEXT_PUBLIC_USE_USER_KEY&project-name=weeklyReportGPT&repo-name=weeklyReportGPT)
-
-### 环境变量配置
 
 在 Vercel 项目设置中添加：
 - `OPENAI_API_KEY` = `your-api-key-here`
 - `NEXT_PUBLIC_USE_USER_KEY` = `false`
 
-🚀 **完整部署指南**: 查看 [Vercel 部署教程](../../wiki/Vercel-Deployment)
+🚀 **详细指南**: 查看 [Vercel 部署教程](../../wiki/Vercel-Deployment)
+
+#### Cloudflare Pages 部署
+
+[![Deploy to Cloudflare Pages](https://deploy.pages.dev.svg)](https://deploy.pages.dev/button/github/laochenfei233/weeklyReportGPT)
+
+使用步骤：
+1. 点击上方按钮连接到 Cloudflare Pages
+2. 设置项目名称
+3. 构建命令：`npm run build`
+4. 输出目录：`out`
+5. 部署完成后配置自定义域名
+
+🚀 **详细指南**: 查看 [Cloudflare Pages 部署](../../wiki/Cloudflare-Pages-Deployment)
+
+#### GitHub Pages 部署
+
+手动部署到 GitHub Pages：
+1. Fork 本项目
+2. 启用 GitHub Pages（Settings → Pages → Source: GitHub Actions）
+3. 推送更改后自动部署
+
+🚀 **详细指南**: 查看 [GitHub Pages 部署](../../wiki/GitHub-Pages-Deployment)
 
 ## 📖 使用指南
 

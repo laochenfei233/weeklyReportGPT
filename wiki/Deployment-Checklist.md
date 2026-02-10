@@ -10,9 +10,18 @@
 
 ### 环境配置
 - [ ] `.env.example` 文件已更新
-- [ ] 生产环境变量已准备
-- [ ] JWT_SECRET 使用强密钥
-- [ ] 数据库配置已确认
+- [ ] 生产环境变量已准备（根据部署平台选择）
+- [ ] JWT_SECRET 使用强密钥（Vercel 需要）
+
+## 🚀 选择部署平台
+
+| 平台 | 推荐场景 | 文档链接 |
+|------|----------|----------|
+| **Vercel** | 需要服务端API、数据库 | [Vercel部署指南](./Vercel-Deployment) |
+| **Cloudflare Pages** | 免费无限流量、全球CDN | [Cloudflare Pages部署](./Cloudflare-Pages-Deployment) |
+| **GitHub Pages** | 免费静态托管、个人项目 | [GitHub Pages部署](./GitHub-Pages-Deployment) |
+
+---
 
 ## 🚀 Vercel 部署步骤
 
@@ -41,6 +50,46 @@
 - [ ] `SMTP_USER` - 邮箱用户名
 - [ ] `SMTP_PASS` - 邮箱密码
 - [ ] `SMTP_FROM` - 发件人地址
+
+---
+
+## ☁️ Cloudflare Pages 部署步骤
+
+### 1. 项目设置
+- [ ] Fork 项目到 GitHub
+- [ ] 连接 Cloudflare Pages 到 GitHub
+- [ ] 选择正确的仓库
+
+### 2. 构建设置
+- [ ] 框架预设: `Next.js`
+- [ ] 构建命令: `npm run build`
+- [ ] 输出目录: `out`
+- [ ] 根目录: `/`
+
+### 3. 部署后配置
+- [ ] 等待构建完成
+- [ ] 测试站点访问
+- [ ] 配置自定义域名（可选）
+
+---
+
+## 📦 GitHub Pages 部署步骤
+
+### 1. 项目设置
+- [ ] Fork 项目到 GitHub
+- [ ] 启用 GitHub Pages
+- [ ] 选择分支: `main`
+- [ ] 选择文件夹: `/(root)`
+
+### 2. GitHub Actions 配置
+- [ ] `.github/workflows/deploy.yml` 已创建
+- [ ] Actions 权限已配置
+- [ ] 首次部署成功
+
+### 3. 部署后配置
+- [ ] 测试站点访问
+- [ ] 配置自定义域名（可选）
+- [ ] 配置 SSL 证书
 
 ## 🗄️ 部署后检查
 
