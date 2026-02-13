@@ -9,7 +9,7 @@ import { ThemeProvider } from '../contexts/ThemeContext';
 function MyApp({ Component, pageProps }: AppProps) {
   // 确保messages和locale存在
   const messages = pageProps.messages || {};
-  const locale = pageProps.locale || 'en';
+  const locale = pageProps.locale || 'zh';
   
   return (
     <SettingsProvider>

@@ -504,11 +504,13 @@ const Home: NextPage = () => {
 export default Home;
 
 export function getStaticProps({ locale }: { locale: string }) {
+  // 处理locale为undefined的情况
+  const validLocale = locale && (locale === 'zh' || locale === 'en') ? locale : 'zh';
+  
   return {
     props: {
-      messages: {
-        ...require(`../messages/${locale}.json`),
-      },
+      messages: validLocale ? (require(`../messages/${validLocale}.json`)) : {},
+      locale: validLocale,
     },
   }
 }
