@@ -1,10 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  i18n: {
-    locales: ['zh', 'en'],
-    defaultLocale: 'zh',
-  },
 
   // 静态导出配置（用于GitHub Pages和Cloudflare Pages）
   output: 'export',
